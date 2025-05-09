@@ -2,6 +2,23 @@
 from thaimeup.models import City, Tour, Order, OrderStatus, UserInfo, Item
 from thaimeup.models import UserAccount
 from datetime import datetime
+from flask import Flask
+from dotenv import load_dotenv
+import os
+import pymysql
+
+load_dotenv()
+
+def get_connection():
+    connection = pymysql.connect(
+        host=os.getenv('DB_HOST'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        database=os.getenv('DB_NAME'),
+        port=int(os.getenv('DB_PORT')),
+        cursorclass=pymysql.cursors.DictCursor
+    )
+    return connection
 
 DummyCity = City('0', 'Dummy', 'Dummy city for testing', 'dummy.jpg')
 
