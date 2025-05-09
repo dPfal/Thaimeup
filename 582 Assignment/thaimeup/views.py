@@ -112,6 +112,13 @@ def login():
 
     return render_template('login.html', form = form)
 
+@bp.route('/logout/')
+def logout():
+    """Clear session and show logout confirmation."""
+    session.clear()
+    flash('You have been logged out.', 'success')
+    
+    return render_template('logout.html')
 
 @bp.route('/register/', methods = ['POST', 'GET'])
 def register():
