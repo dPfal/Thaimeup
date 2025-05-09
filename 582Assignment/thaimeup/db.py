@@ -51,8 +51,7 @@ Items = [
     Item('12', 'Larb', 'Spicy minced chicken salad with lime juice, chili, mint, and roasted rice powder', 'None', '18.00', 'larb.jpeg'),
     Item('13', 'Mango Sticky Rice', 'Sweet sticky rice served with fresh mango and coconut cream', 'None', '14.00', 'mangosticky.jpeg'),
     Item('14', 'Pad Kee Mao', 'Spicy stir-fried rice noodles with chili, garlic, basil, and vegetables', 'None', '21.00', 'padkeemao.jpeg'),
-    Item('15', 'Thai Satay', 'Grilled marinated chicken skewers served with peanut sauce and cucumber relish', 'None', '16.50', 'satay.jpeg')
-]
+    Item('15', 'Thai Satay', 'Grilled marinated chicken skewers served with peanut sauce and cucumber relish', 'None', '16.50', 'satay.jpeg')]
 
 
 DummyTour = Tour('0', 'Dummy Tour', 'Dummy tour for testing',
