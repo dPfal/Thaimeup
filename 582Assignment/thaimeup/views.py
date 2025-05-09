@@ -13,11 +13,6 @@ bp = Blueprint('main', __name__)
 def index():
     return render_template('index.html', items = get_items())
 
-#@bp.route('/tours/<int:cityid>/')
-#def citytours(cityid):
-#    citytours = get_tours_for_city(cityid)
-#    return render_template('citytours.html', tours = citytours, city= get_city(cityid))
-
 @bp.route('/tours/<int:itemid>/')
 def citytours(itemid):
     return render_template('citytours.html', item = get_item(itemid))
