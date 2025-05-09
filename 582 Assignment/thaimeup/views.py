@@ -25,7 +25,6 @@ def citytours(itemid):
 
 @bp.route('/order/', methods = ['POST', 'GET'])
 def order():
-
     item_id = request.args.get('item_id')
     # is this a new order?
     if 'order_id'not in session:
