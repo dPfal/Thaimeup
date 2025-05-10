@@ -29,7 +29,7 @@
                     <h4 class="card-text text-end">A${{ item.price }}</h4>
                 </div>
                 <div class="card-footer">
-                    <a href="{{ url_for('main.citytours', itemid=item.id) }}" class="btn btn-primary">Add to cart</a>
+                    <a href="{{ url_for('main.itemdetails', itemid=item.id) }}" class="btn btn-primary">Add to cart</a>
                 </div>
             </div>
         </div>

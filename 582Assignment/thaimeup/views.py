@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for
 
 from thaimeup.db import add_order, get_orders, check_for_user, add_user
-from thaimeup.db import get_cities, get_city, get_tours_for_city, get_items, get_item
+from thaimeup.db import get_items, get_item
 from thaimeup.session import get_basket, add_to_basket, empty_basket, convert_basket_to_order
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm
 
@@ -13,9 +13,9 @@ bp = Blueprint('main', __name__)
 def index():
     return render_template('index.html', items = get_items())
 
-@bp.route('/tours/<int:itemid>/')
-def citytours(itemid):
-    return render_template('citytours.html', item = get_item(itemid))
+@bp.route('/itemdetails/<int:itemid>/')
+def itemdetails(itemid):
+    return render_template('itemdetails.html', item = get_item(itemid))
 
 
 @bp.route('/order/', methods = ['POST', 'GET'])
@@ -31,11 +31,11 @@ def order():
     if item_id:
         print('user requested to add item id = {}'.format(item_id))
 
-    return render_template('order.html', order = order, totalprice = order.total_cost())
+    return render_template('order.html', order=order, totalprice=float(order.total_cost()))
 
 @bp.post('/basket/<int:item_id>/')
 def adding_to_basket(item_id):
-    add_to_basket(item_id)
+    add_to_basket(item_id, 1)
     return redirect(url_for('main.order'))
 
 @bp.post('/basket/<int:item_id>/<int:quantity>/')
@@ -46,13 +46,20 @@ def adding_to_basket_with_quantity(item_id, quantity):
 @bp.post('/clearbasket/')
 def clear_basket():
     print('User wants to clear the basket')
-    # TODO
+    session['basket'] = {"items": []}
     return redirect(url_for('main.order'))
 
 @bp.post('/removebasketitem/<int:item_id>/')
 def remove_basketitem(item_id):
     print('User wants to delete basket item with id={}'.format(item_id))
-    # TODO
+        # Retrieve the current basket data
+    basket_data = session.get('basket', {"items": []})
+
+    # Remove the item from the basket
+    basket_data["items"] = [item for item in basket_data["items"] if item["id"] != item_id]
+
+    # Update the session with the modified basket
+    session['basket'] = basket_data
     return redirect(url_for('main.order'))
 
 

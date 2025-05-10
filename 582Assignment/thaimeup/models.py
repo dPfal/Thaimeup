@@ -33,30 +33,15 @@ class Item:
     id: str
     name: str
     description: str
-    allergy: str
     price: float
     image: str = 'foobar.png'
 
-    def __init__(self, id, name, description, allergy, price, image):
+    def __init__(self, id, name, description, price, image):
         self.id = id
         self.name = name
         self.description = description
-        self.allergy = allergy
-        self.price = price
+        self.price = float(price)
         self.image = image
-
-
-@dataclass
-class Tour:
-    id: str
-    name: str
-    description: str
-    city: City
-    image: str = 'foobar.png'
-    price: float = 10.00
-    date: datetime = field(
-        default_factory=lambda: datetime.now()
-    )
 
 class OrderStatus(Enum):
     PENDING = 'Pending'
@@ -74,12 +59,12 @@ class UserInfo:
 @dataclass 
 class BasketItem:
     id: str
-    tour: Tour
+    item: Item
     quantity: int = 1
 
     def total_price(self):
         """Calculate the total price for this basket item."""
-        return self.tour.price * self.quantity
+        return float(self.item.price * self.quantity)
     
     def increment_quantity(self):
         """Increment the quantity of this basket item."""
@@ -95,20 +80,19 @@ class Basket:
     items: List[BasketItem] = field(
         default_factory=lambda: [])
 
-    def add_item(self, item: BasketItem):
-        """Add a tour to the basket."""
+    def add_item_basket(self, item: BasketItem):
+        """Add item to the basket."""
         self.items.append(item)
 
-    def remove_item(self, item: BasketItem):
-        """Remove a tour from the basket by its ID."""
-        self.items = [tour for tour in self.items if tour.id != item.id]
+    def remove_item_basket(self, item: BasketItem):
+        """Remove item from the basket by its ID."""
+        self.items = [i for i in self.items if i.id != item.id]
 
-    def get_item(self, item_id: str):
-        """Get a tour from the basket by its ID."""
-        for item in self.items:
-            if item.id == item_id:
-                return item
-        return None
+    def get_item_basket(self, item_id: str):
+        """Get item from the basket by its ID."""
+        for i in self.items:
+            if i.id == item_id:
+                return i
     
     def empty(self):
         """Empty the basket."""

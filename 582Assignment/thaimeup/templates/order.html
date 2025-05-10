@@ -10,18 +10,17 @@
         </div>
 
         {% for item in order.items %}
-        {% set tour = item.tour %}
+        {% set food_item = item.item %}
         <div class="row mb-3">
             <div class="col-sm-12">
                 <div class="card shadow-sm">
                     <div class="card-header">
                         <div class="row">
                             <h5 class="lead col-md-8 col-sm-12">
-                                {{ tour.date.strftime("%d-%m-%Y") }} :
-                                {{ tour.city.name }} {{ tour.name }}
+                                {{ food_item.name }}
                             </h5>
                             <p class="text-success float-end col text-end">
-                                Price: {{ "$%.2f"|format(tour.price) }}
+                                Price: {{ "$%.2f"|format(food_item.price) }}
                             </p>
                         </div>
                     </div>
@@ -29,11 +28,11 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
-                                <img class="img-thumbnail" src="{{ url_for('static', filename='img/' + tour.image) }}"
+                                <img class="img-thumbnail" src="{{ url_for('static', filename='img/' + food_item.image) }}"
                                     style="max-height: 200px; min-height: 100px;">
                             </div>
                             <div class="col-8">
-                                <p class="card-text">{{ tour.description }}</p>
+                                <p class="card-text">{{ food_item.description }}</p>
                             </div>
                         </div>
                         <div class="float-end">
@@ -44,8 +43,6 @@
                     </div>
                 </div>
             </div>
-
-
         </div>
         {% endfor %}
 
