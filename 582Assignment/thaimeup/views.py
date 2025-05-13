@@ -97,6 +97,10 @@ def update_basket_quantity(item_id, action):
 
 @bp.route('/checkout/', methods = ['POST', 'GET'])
 def checkout():
+    if not session.get('logged_in'):
+        flash('Please log in to proceed to checkout.', 'error')
+        return redirect(url_for('main.order'))
+    
     form = CheckoutForm() 
     if request.method == 'POST':
         
