@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for
-
+from thaimeup import mysql
 from thaimeup.db import add_order, get_orders, check_for_user, add_user
 from thaimeup.db import get_items, get_item
 from thaimeup.session import get_basket, add_to_basket, empty_basket, convert_basket_to_order
@@ -177,3 +177,19 @@ def register():
             return redirect(url_for('main.login'))
 
     return render_template('register.html', form = form)
+
+@bp.route('/testdb/')
+def test_db_connection():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM items")
+        results = cur.fetchall()
+        cur.close()
+
+        if not results:
+            return "✅ DB connected, but no data found."
+
+        return f"✅ DB connected! Results: <br>" + "<br>".join([str(row) for row in results])
+
+    except Exception as e:
+        return f"❌ DB connection failed: {e}"
