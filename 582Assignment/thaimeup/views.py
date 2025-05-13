@@ -11,7 +11,15 @@ bp = Blueprint('main', __name__)
 
 @bp.route('/')
 def index():
-    return render_template('index.html', items = get_items())
+    category = request.args.get('category', 'all')
+    
+    items = get_items()
+    
+    if category != 'all':
+        items = [item for item in items if item.category.lower() == category.lower()]
+    
+    return render_template('index.html', items=items, category=category)
+
 
 #@bp.route('/tours/<int:cityid>/')
 #def citytours(cityid):

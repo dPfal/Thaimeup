@@ -29,21 +29,15 @@ class City:
     description: str = 'fooobar'
     image: str = 'foobar.png'
 
+@dataclass
 class Item:
     id: str
     name: str
     description: str
     allergy: str
+    category: str   # 新增 category 屬性
     price: float
     image: str = 'foobar.png'
-
-    def __init__(self, id, name, description, allergy, price, image):
-        self.id = id
-        self.name = name
-        self.description = description
-        self.allergy = allergy
-        self.price = price
-        self.image = image
 
 
 @dataclass
