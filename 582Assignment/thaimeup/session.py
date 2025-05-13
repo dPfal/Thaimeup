@@ -23,19 +23,28 @@ def add_to_basket(item_id, quantity=1):
     session.setdefault('basket', {"items": []})
     basket = get_basket()
     item_obj = get_item(item_id)
-    basket.add_item_basket(BasketItem(item_id, item_obj, quantity))
-    print("Updated Basket:", session['basket'])  # Check the structure
+
+    found = False
+    for item in basket.items:
+        if item.item.id == item_obj.id:  
+            item.quantity += quantity
+            found = True
+            break
+
+    if not found:
+        new_item = BasketItem(item_id, item_obj, quantity)
+        basket.add_item_basket(new_item)
+
     session['basket'] = {
         "items": [
             {
                 "id": i.id,
-                "item_id": i.item.id if i.item else None,  # Ensure item exists
+                "item_id": i.item.id,
                 "quantity": i.quantity
             }
             for i in basket.items
         ]
     }
-
 
 def remove_from_basket(basket_item_id):
     basket = get_basket() 

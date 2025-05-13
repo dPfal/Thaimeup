@@ -63,6 +63,35 @@ def remove_basketitem(item_id):
     session['basket'] = basket_data
     return redirect(url_for('main.order'))
 
+@bp.post('/updatebasket/<int:item_id>/<string:action>/')
+def update_basket_quantity(item_id, action):
+    item_to_remove = None
+    basket = get_basket()
+    for item in basket.items:
+        if item.id == item_id:
+            if action == 'increase':
+                item.increment_quantity()
+            elif action == 'decrease':
+                if item.quantity > 1:
+                    item.decrement_quantity()
+                else:
+                    item_to_remove = item 
+            break
+
+    if item_to_remove:
+        basket.remove_item_basket(item_to_remove)
+
+    session['basket'] = {
+        "items": [
+            {
+                "id": i.id,
+                "item_id": i.item.id,
+                "quantity": i.quantity
+            }
+            for i in basket.items
+        ]
+    }
+    return redirect(url_for('main.order'))
 
 @bp.route('/checkout/', methods = ['POST', 'GET'])
 def checkout():

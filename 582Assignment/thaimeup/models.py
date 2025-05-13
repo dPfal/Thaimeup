@@ -60,7 +60,7 @@ class UserInfo:
 class BasketItem:
     id: str
     item: Item
-    quantity: int = 1
+    quantity: int
 
     def total_price(self):
         """Calculate the total price for this basket item."""
