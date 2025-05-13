@@ -29,7 +29,8 @@ def order():
     order = get_basket()
     # are we adding an item? - will be implemented later with DB
     if item_id:
-        print('user requested to add item id = {}'.format(item_id))
+        add_to_basket(item_id, 1)
+        print('Added item_id={} to basket.'.format(item_id))
 
     return render_template('order.html', order=order, totalprice=float(order.total_cost()))
 
