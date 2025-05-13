@@ -3,22 +3,7 @@ from thaimeup.models import City, Order, OrderStatus, UserInfo, Item
 from thaimeup.models import UserAccount
 from datetime import datetime
 from flask import Flask
-from dotenv import load_dotenv
-import os
-import pymysql
 
-load_dotenv()
-
-def get_connection():
-    connection = pymysql.connect(
-        host=os.getenv('DB_HOST'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASSWORD'),
-        database=os.getenv('DB_NAME'),
-        port=int(os.getenv('DB_PORT')),
-        cursorclass=pymysql.cursors.DictCursor
-    )
-    return connection
 
 DummyCity = City('0', 'Dummy', 'Dummy city for testing', 'dummy.jpg')
 
@@ -114,6 +99,13 @@ def get_order(order_id):
         if order.id == order_id:
             return order
     return None  # or raise an exception if preferred
+
+def get_user_by_id(user_id):
+    """Find a UserAccount by user_id."""
+    for user in Users:
+        if user.info.id == str(user_id): 
+            return user
+    return None
 
 def check_for_user(username, password):
     """Check if the username and password are valid."""
