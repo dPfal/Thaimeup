@@ -84,6 +84,7 @@
                             </button>
                         </a>
                     </li>
+                    {% if session['logged_in'] %}
                     <li class="nav-item ms-2 me-2">
                         <a href="{{ url_for('main.logout') }}">
                             <button class="btn btn-dark">
@@ -91,6 +92,7 @@
                             </button>
                         </a>
                     </li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
