@@ -3,32 +3,31 @@
 {% block main %}
 <!-- display items -->
 <section class="shadow-sm mb-5">
-
     <div class="text-dark text-center">
-        <div>
-            <p class="h3 text-dark mb-4">See item details below</p>
-        </div>
+        <p class="h3 text-dark mb-4">See item details below</p>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-5 mb-4">
-            <div class="card h-100">
+            <div class="card h-100 d-flex flex-column">
                 <img class="card-img-top" src="{{ url_for('static', filename='img/' + item.image) }}" alt="Card image">
-                <div class="card-body">
+
+                <div class="card-body d-flex flex-column">
                     <h4 class="card-title">{{ item.name }}</h4>
                     <p class="card-text">{{ item.description }}</p>
-                    <p class="card-text float-end text-danger">Price: ${{ item.price }}</p>
+                    <p class="card-text mt-auto float-end text-danger">Price: ${{ item.price }}</p>
                 </div>
-                <div class="card-footer">
-                    <form method="POST" action="{{ url_for('main.adding_to_basket', item_id = item.id) }}">
-                        <input type="submit" value="Add to Basket" class="btn "
-                            style="background-color: #FF8C3F;color:white ">
+
+                <div class="card-footer bg-white border-top-0">
+                    <form method="POST" action="{{ url_for('main.adding_to_basket', item_id=item.id) }}">
+                        <button type="submit" class="btn w-100"
+                            style="background-color: #FF8C3F; color: white; height: 50px;">
+                            Add to Basket
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
-
 </section>
 {% endblock %}
