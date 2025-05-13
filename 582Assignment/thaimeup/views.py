@@ -37,6 +37,7 @@ def order():
 @bp.post('/basket/<int:item_id>/')
 def adding_to_basket(item_id):
     add_to_basket(item_id, 1)
+    print(get_basket())
     return redirect(url_for('main.order'))
 
 @bp.post('/basket/<int:item_id>/<int:quantity>/')
@@ -48,6 +49,7 @@ def adding_to_basket_with_quantity(item_id, quantity):
 def clear_basket():
     print('User wants to clear the basket')
     session['basket'] = {"items": []}
+    print(get_basket())
     return redirect(url_for('main.order'))
 
 @bp.post('/removebasketitem/<int:item_id>/')
