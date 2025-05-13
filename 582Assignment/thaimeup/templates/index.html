@@ -68,12 +68,13 @@
                 <a href="{{ url_for('main.itemdetails', itemid=item.id) }}">
                     <img class="card-img-top" src="{{ url_for('static', filename='img/' + item.image) }}"
                         alt="{{ item.name }}">
+
+                    <div class="card-body">
+                        <h4 class="card-title">{{ item.name }}</h4>
+                        <p class="card-text">{{ item.description }}</p>
+                        <h4 class="card-text text-end">A${{ item.price }}</h4>
+                    </div>
                 </a>
-                <div class="card-body">
-                    <h4 class="card-title">{{ item.name }}</h4>
-                    <p class="card-text">{{ item.description }}</p>
-                    <h4 class="card-text text-end">A${{ item.price }}</h4>
-                </div>
                 <div class="card-footer">
                     <form method="POST" action="{{ url_for('main.adding_to_basket', item_id=item.id) }}">
                         <button type="submit" class="btn button">Add to Cart</button>
