@@ -1,16 +1,57 @@
 {% extends 'base.html' %}
 
 {% block main %}
+<style>
+    .register-link {
+        text-decoration: none;
+        color: orange;
+    }
+    .h1 {
+        font-size: 50px;
+        text-align: center;
+    }
+    .register-intr{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+    .form-label{
+        font-size: 22px;
+        font-weight: bold;
+    }
+    .form-control {
+        font-size: 20px;
+    }
+    .btn.button {
+        background-color: orange;
+        color: #000;
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+        
+    }
+    .d-grid.btn-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+    .card-container {
+        border-radius: 15px;
+        padding-top: 2rem;
+        box-shadow: #000 5px 5px 5px;
+    }
+</style>
 <section class="shadow-sm mb-5 mt-5">  
-    <div class="container">
+    <div class="container card-container">
         <div class="row">
             <div class="col-12">
-                <h1>User Registry</h1>
-                <p>
+                <h1 class="h1">User Registry</h1>
+                <p class="register-intr">
                     Thank you for interested in Thai Me Up. Please provide
                     your details to create your account. 
-                    If you already have an account, please 
-                    <a href="{{ url_for('main.login') }}">login here</a>.
+                    If you already have an account 
+                    ,  </br> <a href="{{ url_for('main.login') }}" class="register-link">login here</a>.
                 </p>
             </div>
         </div>
@@ -68,8 +109,8 @@
                         {% endfor %}
                     </div>
 
-                    <div class="d-grid">
-                        {{ form.submit(class="btn btn-primary") }}
+                    <div class="d-grid btn-container">
+                        {{ form.submit(class="btn button") }}
                     </div>
                 </form>
             </div>

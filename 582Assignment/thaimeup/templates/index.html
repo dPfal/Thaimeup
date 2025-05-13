@@ -24,92 +24,62 @@
         margin-right: 8px;
     }
 
-    /* 在 items 區塊裡移除所有連結的底線 */
     #items a {
         text-decoration: none;
-        /* 關掉底線 */
         color: inherit;
-        /* 保持原本文字顏色 */
     }
 
-    /* 滑過也不要出現底線 */
     #items a:hover,
     #items a:focus {
         text-decoration: none;
     }
 
-    /* （選擇性）讓整張卡片游標變手指，更明顯可點 */
-    #items a .card {
+    #items .card {
         cursor: pointer;
     }
 </style>
 
-<!-- Individual Category Buttons -->
+<!-- Category Buttons -->
 <div class="text-center mb-4">
     <form method="GET" action="{{ url_for('main.index') }}">
         <div class="row justify-content-center">
+            {% for cat in ['all', 'Rice', 'Noodle', 'Entree', 'Salad', 'Curry'] %}
             <div class="col-md-2 mb-2">
-                <button type="submit" name="category" value="all"
-                    class="btn {% if category == 'all' %}btn-secondary{% else %}btn-light{% endif %} w-100">
-                    <span class="category-icon">📋</span> All
+                <button type="submit" name="category" value="{{ cat }}"
+                    class="btn {% if category == cat %}btn-secondary{% else %}btn-light{% endif %} w-100">
+                    <span class="category-icon">
+                        {% if cat == 'all' %}📋{% elif cat == 'Rice' %}🍚{% elif cat == 'Noodle' %}🍝{% elif cat ==
+                        'Entree' %}🥙{% elif cat == 'Salad' %}🥗{% elif cat == 'Curry' %}🍛{% endif %}
+                    </span> {{ cat }}
                 </button>
             </div>
-            <div class="col-md-2 mb-2">
-                <button type="submit" name="category" value="Rice"
-                    class="btn {% if category == 'Rice' %}btn-secondary{% else %}btn-light{% endif %} w-100">
-                    <span class="category-icon">🍚</span> Rice
-                </button>
-            </div>
-            <div class="col-md-2 mb-2">
-                <button type="submit" name="category" value="Noodle"
-                    class="btn {% if category == 'Noodle' %}btn-secondary{% else %}btn-light{% endif %} w-100">
-                    <span class="category-icon">🍝</span> Noodle
-                </button>
-            </div>
-            <div class="col-md-2 mb-2">
-                <button type="submit" name="category" value="Entree"
-                    class="btn {% if category == 'Entree' %}btn-secondary{% else %}btn-light{% endif %} w-100">
-                    <span class="category-icon">🥙</span> Entree
-                </button>
-            </div>
-            <div class="col-md-2 mb-2">
-                <button type="submit" name="category" value="Salad"
-                    class="btn {% if category == 'Salad' %}btn-secondary{% else %}btn-light{% endif %} w-100">
-                    <span class="category-icon">🥗</span> Salad
-                </button>
-            </div>
-            <div class="col-md-2 mb-2">
-                <button type="submit" name="category" value="Curry"
-                    class="btn {% if category == 'Curry' %}btn-secondary{% else %}btn-light{% endif %} w-100">
-                    <span class="category-icon">🍛</span> Curry
-                </button>
-            </div>
+            {% endfor %}
         </div>
     </form>
 </div>
 
-<!-- Display items -->
+<!-- Item List -->
 <section class="shadow-sm p-5" id="items">
     <div class="row ps-2 pe-2">
         {% if items %}
         {% for item in items %}
         <div class="col-md-4 mb-4">
-            <a href="{{ url_for('main.citytours', itemid=item.id) }}">
-                <div class="card h-100">
+            <div class="card h-100">
+                <a href="{{ url_for('main.itemdetails', itemid=item.id) }}">
                     <img class="card-img-top" src="{{ url_for('static', filename='img/' + item.image) }}"
                         alt="{{ item.name }}">
-                    <div class="card-body">
-                        <h4 class="card-title">{{ item.name }}</h4>
-                        <p class="card-text">{{ item.description }}</p>
-                        <h4 class="card-text text-end">A${{ item.price }}</h4>
-                    </div>
-                    <div class="card-footer">
-                        <form method="POST" action="{{ url_for('main.adding_to_basket', item_id=item.id) }}">
-                            <button type="submit" class="btn button">Add to Cart</button>
-                        </form>
-                    </div>
+                </a>
+                <div class="card-body">
+                    <h4 class="card-title">{{ item.name }}</h4>
+                    <p class="card-text">{{ item.description }}</p>
+                    <h4 class="card-text text-end">A${{ item.price }}</h4>
                 </div>
-            </a>
+                <div class="card-footer">
+                    <form method="POST" action="{{ url_for('main.adding_to_basket', item_id=item.id) }}">
+                        <button type="submit" class="btn button">Add to Cart</button>
+                    </form>
+                </div>
+            </div>
         </div>
         {% endfor %}
         {% else %}
@@ -119,5 +89,4 @@
         {% endif %}
     </div>
 </section>
-
 {% endblock %}

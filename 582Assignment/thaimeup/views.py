@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for
-
+from thaimeup import mysql
 from thaimeup.db import add_order, get_orders, check_for_user, add_user
-from thaimeup.db import get_cities, get_city, get_tours_for_city, get_items, get_item
+from thaimeup.db import get_items, get_item, get_user_by_id
 from thaimeup.session import get_basket, add_to_basket, empty_basket, convert_basket_to_order
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm
 
@@ -21,14 +21,9 @@ def index():
     return render_template('index.html', items=items, category=category)
 
 
-#@bp.route('/tours/<int:cityid>/')
-#def citytours(cityid):
-#    citytours = get_tours_for_city(cityid)
-#    return render_template('citytours.html', tours = citytours, city= get_city(cityid))
-
-@bp.route('/tours/<int:itemid>/')
-def citytours(itemid):
-    return render_template('citytours.html', item = get_item(itemid))
+@bp.route('/itemdetails/<int:itemid>/')
+def itemdetails(itemid):
+    return render_template('itemdetails.html', item = get_item(itemid))
 
 
 @bp.route('/order/', methods = ['POST', 'GET'])
@@ -42,13 +37,15 @@ def order():
     order = get_basket()
     # are we adding an item? - will be implemented later with DB
     if item_id:
-        print('user requested to add item id = {}'.format(item_id))
+        add_to_basket(item_id, 1)
+        print('Added item_id={} to basket.'.format(item_id))
 
-    return render_template('order.html', order = order, totalprice = order.total_cost())
+    return render_template('order.html', order=order, totalprice=float(order.total_cost()))
 
 @bp.post('/basket/<int:item_id>/')
 def adding_to_basket(item_id):
-    add_to_basket(item_id)
+    add_to_basket(item_id, 1)
+    print(get_basket())
     return redirect(url_for('main.order'))
 
 @bp.post('/basket/<int:item_id>/<int:quantity>/')
@@ -59,24 +56,73 @@ def adding_to_basket_with_quantity(item_id, quantity):
 @bp.post('/clearbasket/')
 def clear_basket():
     print('User wants to clear the basket')
-    # TODO
+    session['basket'] = {"items": []}
+    print(get_basket())
     return redirect(url_for('main.order'))
 
 @bp.post('/removebasketitem/<int:item_id>/')
 def remove_basketitem(item_id):
     print('User wants to delete basket item with id={}'.format(item_id))
-    # TODO
+        # Retrieve the current basket data
+    basket_data = session.get('basket', {"items": []})
+
+    # Remove the item from the basket
+    basket_data["items"] = [item for item in basket_data["items"] if item["id"] != item_id]
+
+    # Update the session with the modified basket
+    session['basket'] = basket_data
     return redirect(url_for('main.order'))
 
+@bp.post('/updatebasket/<int:item_id>/<string:action>/')
+def update_basket_quantity(item_id, action):
+    item_to_remove = None
+    basket = get_basket()
+    for item in basket.items:
+        if item.id == item_id:
+            if action == 'increase':
+                item.increment_quantity()
+            elif action == 'decrease':
+                if item.quantity > 1:
+                    item.decrement_quantity()
+                else:
+                    item_to_remove = item 
+            break
 
-@bp.route('/checkout/', methods = ['POST', 'GET'])
+    if item_to_remove:
+        basket.remove_item_basket(item_to_remove)
+
+    session['basket'] = {
+        "items": [
+            {
+                "id": i.id,
+                "item_id": i.item.id,
+                "quantity": i.quantity
+            }
+            for i in basket.items
+        ]
+    }
+    return redirect(url_for('main.order'))
+
+@bp.route('/checkout/', methods=['POST', 'GET'])
 def checkout():
-    form = CheckoutForm() 
+    if not session.get('logged_in'):
+        flash('Please log in to proceed to checkout.', 'error')
+        return redirect(url_for('main.order'))
+
+    form = CheckoutForm()
+    order = get_basket()
+    totalprice = order.total_cost()
+
+    user = get_user_by_id(session.get('user_id'))
+
+    if request.method == 'GET' and user:
+        form.firstname.data = user.info.firstname
+        form.surname.data = user.info.surname
+        form.email.data = user.info.email
+        form.phone.data = user.info.phone
+        form.address.data = getattr(user.info, 'address', '')
+
     if request.method == 'POST':
-        
-        #retrieve correct order object
-        order = get_basket()
-       
         if form.validate_on_submit():
             order.status = True
             order.firstname = form.firstname.data
@@ -84,17 +130,16 @@ def checkout():
             order.email = form.email.data
             order.phone = form.phone.data
             order.address = form.address.data
-            flash('Thank you for your information, your order is being processed!',)
-            order = convert_basket_to_order(get_basket())
+
+            flash('Thank you for your information, your order is being processed!')
+            order = convert_basket_to_order(order)
             empty_basket()
             add_order(order)
-            print('Number of orders in db: {}'.format(len(get_orders())))
             return redirect(url_for('main.index'))
         else:
-            flash('The provided information is missing or incorrect. Please complete the fields correctly to process your order.',
-                  'error')
+            flash('Please correct the form errors.', 'error')
 
-    return render_template('checkout.html', form = form)
+    return render_template('checkout.html', form=form, order=order, totalprice=totalprice)
 
 
 @bp.route('/login/', methods = ['POST', 'GET'])
@@ -113,13 +158,23 @@ def login():
                 return redirect(url_for('main.login'))
 
             # Store user information in the session
-            session['username'] = user.username
+            session['firstname'] = user.info.firstname
+            session['surname'] = user.info.surname
+            session['email'] = user.info.email
+            session['phone'] = user.info.phone
             session['logged_in'] = True
             flash('Login successful!')
             return redirect(url_for('main.index'))
 
     return render_template('login.html', form = form)
 
+@bp.route('/logout/')
+def logout():
+    """Clear session and show logout confirmation."""
+    session.clear()
+    flash('You have been logged out.', 'success')
+    
+    return render_template('logout.html')
 
 @bp.route('/register/', methods = ['POST', 'GET'])
 def register():
@@ -144,3 +199,19 @@ def register():
             return redirect(url_for('main.login'))
 
     return render_template('register.html', form = form)
+
+@bp.route('/testdb/')
+def test_db_connection():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM items")
+        results = cur.fetchall()
+        cur.close()
+
+        if not results:
+            return "✅ DB connected, but no data found."
+
+        return f"✅ DB connected! Results: <br>" + "<br>".join([str(row) for row in results])
+
+    except Exception as e:
+        return f"❌ DB connection failed: {e}"

@@ -1,4 +1,4 @@
-from thaimeup.db import DummyUserInfo, get_tours, get_tour
+from thaimeup.db import DummyUserInfo, get_item
 from thaimeup.models import Basket, BasketItem
 from thaimeup.models import UserInfo, Order, OrderStatus
 
@@ -10,29 +10,45 @@ def get_user():
     return session.get('user', DummyUserInfo)
 
 def get_basket():
-    basket =  session.get('basket', DummyBasket)
-    # we need to convert the basket items from dicts to BasketItem objects
-    # this is a bit of a hack, but it works for now
-    if isinstance(basket, dict):
-        tmp = Basket()
-        for item in basket.get('items', []):
-            tmp.add_item(
-                BasketItem(item['id'],
-                get_tour(item['tour']['id']), 
-                item['quantity'])
-            )
-        basket = tmp
-    return basket
+    
+    basket_data = session.get('basket', {})
+    tmp = Basket()
+    for item in basket_data.get('items', []):
+        tmp.add_item_basket(
+            BasketItem(item['id'], get_item(item.get('item_id')), item.get('quantity', 1))
+        )
+    return tmp
 
-def add_to_basket(tour_id, quantity=1):
+def add_to_basket(item_id, quantity=1):
+    session.setdefault('basket', {"items": []})
     basket = get_basket()
-    basket.add_item(BasketItem(tour_id, get_tour(tour_id), quantity))
-    # now store/update the basket in the session
-    session['basket'] = basket
+    item_obj = get_item(item_id)
+
+    found = False
+    for item in basket.items:
+        if item.item.id == item_obj.id:  
+            item.quantity += quantity
+            found = True
+            break
+
+    if not found:
+        new_item = BasketItem(item_id, item_obj, quantity)
+        basket.add_item_basket(new_item)
+
+    session['basket'] = {
+        "items": [
+            {
+                "id": i.id,
+                "item_id": i.item.id,
+                "quantity": i.quantity
+            }
+            for i in basket.items
+        ]
+    }
 
 def remove_from_basket(basket_item_id):
     basket = get_basket() 
-    basket.remove_item(basket_item_id)
+    basket.remove_item_basket(basket_item_id)
     # now store/update the basket in the session
     session['basket'] = basket
 

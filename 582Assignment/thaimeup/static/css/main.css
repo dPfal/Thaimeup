@@ -1,0 +1,10 @@
+/* Main color: #FF8C3F, Sub Color: #FFB27E */
+.mainColor {
+  background-color: #ff8c3f !important;
+  border: 0 !important;
+  color: white !important;
+}
+
+body {
+  font-family: "Noto Sans", sans-serif;
+}

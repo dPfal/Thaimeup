@@ -1,124 +1,127 @@
 {% extends 'base.html' %}
-
 {% import 'bootstrap5/form.html' as wtf %}
 
 {% block main %}
-<section class="shadow-sm mb-5 mt-5">  
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <h1>Checkout</h1>
-                <div class="row">
-                    <div class="col card m-3 p-3">
-                      <h4>Order Summary</h4>
-                      <hr>
-                      <div class="mt-3">
-                        <div class="d-flex align-items-center mb-3">
-                          <a href="product_details.html"><img src="img/products/chicken.png" class="img-thumbnail"
-                              width="100px"></a>
-                          <div class="ms-3">
-                            <a href="product_details.html"><b>Leefresh Medium Whole Chicken | approx. 1.65kg</b></a><br>
-                            <span>Quantity: 2</span><br>
-                            <span>Total Price: $18.40</span>
-                          </div>
-                        </div>
-            
-                        <div class="d-flex align-items-center mb-3">
-                          <a href="product_details.html"><img src="img/products/cookie.png" class="img-thumbnail" width="100px"></a>
-                          <div class="ms-3">
-                            <a href="product_details.html"><b>Leefresh Bakery Chocolate Chip Cookies Value Pack | 12
-                                pack</b></a><br>
-                            <span>Quantity: 4</span><br>
-                            <span>Total Price: $16.00</span>
-                          </div>
-                        </div>
-            
-                        <div class="d-flex align-items-center mb-3">
-                          <a href="product_details.html"><img src="img/products/soda.png" class="img-thumbnail" width="100px"></a>
-                          <div class="ms-3">
-                            <a href="product_details.html"><b>Leefresh Lemon Soda | 300mL</b></a><br>
-                            <span>Quantity: 8</span><br>
-                            <span>Total Price: $24.00</span>
-                          </div>
-                        </div>
-            
-                        <div class="d-flex align-items-center mb-3">
-                          <a href="product_details.html"><img src="img/products/bread.png" class="img-thumbnail" width="100px "></a>
-                          <div class="ms-3">
-                            <a href="product_details.html"><b>Leefresh Plain Croissant | 1 each</b></a><br>
-                            <span>Quantity: 2</span><br>
-                            <span>Total Price: $8.60</span>
-                          </div>
-                        </div>
-            
-                        <div class="mt-4">
-                          <h2>Total: $67.00</h2>
-                        </div>
-                      </div>
-                      
-                    </div>
-            
-                </div>
+<section class="shadow-sm mb-5 mt-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h1>Checkout</h1>
 
-                <div class="row">
-                    <div class="col card m-3 p-3">
-                      <h4>Delivery Information</h4>
-                      <hr>
-                      <div class="p-1">
-                        <legend class="">Delivery method </legend>
-                        <div class="form-check">
-                          <label class="form-check-label" for="standardShipping">Standard Delivery</label>
-                          <input class="form-check-input" type="radio" name="shippingMethod" id="standardShipping" value="standard"
-                            checked>
-                        </div>
-                        <div class="form-check">
-                          <label class="form-check-label" for="expressShipping">Express Delivery (+$10.00)</label>
-                          <input class="form-check-input" type="radio" name="shippingMethod" id="expressShipping" value="express">
-                        </div>
-                        <div class="form-check">
-                          <label class="form-check-label" for="ecoShipping">Eco-Delivery (+$5.00)</label>
-                          <input class="form-check-input" type="radio" name="shippingMethod" id="ecoShipping" value="eco">
-                        </div>
-                        <legend class="mt-4">Delivery time slot </legend>
-                        <div class="form-group col-md-4 mb-3">
-                          <select id="inputTime" class="form-select" required>
-                            <option selected>Select time</option>
-                            <option>9:00 - 11:00</option>
-                            <option>13:00 - 15:00</option>
-                            <option>17:00 - 19:00</option>
-            
-                          </select>
-                        </div>
-            
-                        <legend class="mt-4">Payment method</legend>
-                        <div class="form-check">
-                          <label class="form-check-label" for="paypal">PayPal</label>
-                          <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal" checked>
-                        </div>
-                        <div class="form-check">
-                          <label class="form-check-label" for="applePay">Apple Pay</label>
-                          <input class="form-check-input" type="radio" name="paymentMethod" id="applePay" value="applepay">
-                        </div>
-            
-                        <div class="form-check">
-                          <label class="form-check-label" for="creditCard">Credit/Debit Card</label>
-                          <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="creditcard">
-                        </div>
-            
-                        <legend class="mt-4">Contact Details</Details></legend>
+        <form method="POST" action="{{ url_for('main.checkout') }}">
+          {{ form.hidden_tag() }}
 
-                        <div class="row mt-4 justify-content-start p-3">
-                            <div class="col-md-8">
-                                {{ wtf.render_form(form) }}
-                            </div>
-                        </div>
-                        
-                      </div>
-            
-                    </div>
+          <div class="row">
+            <!-- 🧾 Order Summary -->
+            <div class="col card m-3 p-3">
+              <h4>Order Summary</h4>
+              <hr>
+              {% for item in order.items %}
+              {% set food_item = item.item %}
+              <div class="d-flex align-items-center mb-3">
+                <img src="{{ url_for('static', filename='img/' + food_item.image) }}" class="img-thumbnail"
+                  width="100px">
+                <div class="ms-3">
+                  <b>{{ food_item.name }}</b><br>
+                  <span>Quantity: {{ item.quantity }}</span><br>
+                  <span>Total Price: ${{ "%.2f"|format(item.total_price()) }}</span>
                 </div>
+              </div>
+              {% endfor %}
+              <div class="mt-4">
+                <h2>Total: ${{ "%.2f"|format(totalprice) }}</h2>
+              </div>
             </div>
-        </div>
+
+            <!-- 🚚 Delivery + 💳 Payment + 📞 Contact -->
+            <div class="col card m-3 p-3">
+              <h4>Delivery Information</h4>
+              <hr>
+
+              <!-- Delivery Method -->
+              <legend class="mt-3">Delivery method</legend>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="delivery_method" value="standard" checked>
+                <label class="form-check-label">Standard Delivery</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="delivery_method" value="express">
+                <label class="form-check-label">Express Delivery (+$10.00)</label>
+              </div>
+              <div class="form-check mb-4">
+                <input class="form-check-input" type="radio" name="delivery_method" value="eco">
+                <label class="form-check-label">Eco-Delivery (+$5.00)</label>
+              </div>
+
+              <!-- Payment Method -->
+              <legend>Payment method</legend>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_method" value="paypal" checked>
+                <label class="form-check-label">PayPal</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_method" value="applepay">
+                <label class="form-check-label">Apple Pay</label>
+              </div>
+              <div class="form-check mb-4">
+                <input class="form-check-input" type="radio" name="payment_method" value="creditcard">
+                <label class="form-check-label">Credit/Debit Card</label>
+              </div>
+
+              <!-- Contact Info -->
+              <legend>Contact Details</legend>
+              <form method="POST" action="{{ url_for('main.checkout') }}" novalidate
+                class="{% if was_validated %}was-validated{% endif %}">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                  <label for="firstname">First name</label>
+                  <input type="text" class="form-control" id="firstname" name="firstname"
+                    value="{{ session.get('firstname', '') }}" required>
+                  <div class="invalid-feedback">Please enter your first name.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="surname">Last name</label>
+                  <input type="text" class="form-control" id="surname" name="surname"
+                    value="{{ session.get('surname', '') }}" required>
+                  <div class="invalid-feedback">Please enter your last name.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="email">Email</label>
+                  <input type="email" class="form-control" id="email" name="email"
+                    value="{{ session.get('email', '') }}" required>
+                  <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="phone">Phone</label>
+                  <input type="text" class="form-control" id="phone" name="phone" value="{{ session.get('phone', '') }}"
+                    required>
+                  <div class="invalid-feedback">Please enter your phone number.</div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="address">Address</label>
+                  <input type="text" class="form-control" id="address" name="address" value="" required>
+                  <div class="invalid-feedback">Please enter your address.</div>
+                </div>
+
+                <div class="mt-4">
+                  <button type="submit" class="btn btn-success btn-lg px-4 w-100">
+                    <i class="bi bi-check-circle me-2"></i>Place Order
+                  </button>
+                </div>
+              </form>
+
+
+            </div>
+          </div>
+        </form>
+
+      </div>
     </div>
+  </div>
 </section>
 {% endblock %}

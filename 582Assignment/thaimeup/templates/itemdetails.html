@@ -11,30 +11,24 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-md-4 mb-4">
+        <div class="col-5 mb-4">
             <div class="card h-100">
-                <img class="card-img-top" 
-                    src="{{ url_for('static', filename='img/' + item.image) }}" 
-                    alt="Card image">
+                <img class="card-img-top" src="{{ url_for('static', filename='img/' + item.image) }}" alt="Card image">
                 <div class="card-body">
                     <h4 class="card-title">{{ item.name }}</h4>
                     <p class="card-text">{{ item.description }}</p>
-                    <p class="card-text">{{ item.allergy }}</p>
                     <p class="card-text float-end text-danger">Price: ${{ item.price }}</p>
                 </div>
                 <div class="card-footer">
-                    <form method="POST" 
-                        action="{{ url_for('main.adding_to_basket', item_id = item.id) }}">
-                        <input 
-                            type="submit" 
-                            value="Add to Basket" 
-                            class="btn btn-primary">
-                    </form> 
+                    <form method="POST" action="{{ url_for('main.adding_to_basket', item_id = item.id) }}">
+                        <input type="submit" value="Add to Basket" class="btn "
+                            style="background-color: #FF8C3F;color:white ">
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-    
+
 
 </section>
 {% endblock %}

@@ -1,17 +1,58 @@
 {% extends 'base.html' %}
 
 {% block main %}
+<style>
+    .register-link {
+        text-decoration: none;
+        color: orange;
+    }
+    .h1 {
+        font-size: 50px;
+        text-align: center;
+    }
+    .register-intr{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+    .form-label{
+        font-size: 22px;
+        font-weight: bold;
+    }
+    .form-control {
+        font-size: 20px;
+    }
+    .btn.button {
+        background-color: orange;
+        color: #000;
+        margin-top: 2rem;
+        margin-bottom: 3rem;
+        
+    }
+    .btn-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+    .card-container {
+        border-radius: 15px;
+        padding-top: 2rem;
+        box-shadow: #000 5px 5px 5px;
+    }
+</style>
 <section class="shadow-sm mb-5 mt-5">  
-    <div class="container">
+    <div class="container card-container">
         <div class="row">
             <div class="col-12">
-                <h1>User Login</h1>
-                <p>
+                <h1 class="h1">User Login</h1>
+                <p class="register-intr">
                     Thank you for returning to Thai Me Up. Please provide
                     your login details to access your account. 
-                    If you do not have an account, please 
-                    <a href="{{ url_for('main.register') }}">
-                        register first
+                    If you do not have an account,  
+                    <a href="{{ url_for('main.register') }}" class="register-link">
+                         register first
                     </a>    
                     .
                 </p>
@@ -31,8 +72,9 @@
                         {{ form.password.label(class="form-label") }}
                         {{ form.password(class="form-control") }}
                     </div>
-
-                    {{ form.submit(class="btn btn-primary") }}
+                    <div class="btn-container">
+                    {{ form.submit(class="btn button") }}
+                    </div>
                 </form>
             </div>
         </div>
