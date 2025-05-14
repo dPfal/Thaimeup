@@ -40,7 +40,7 @@ def order():
         add_to_basket(item_id, 1)
         print('Added item_id={} to basket.'.format(item_id))
 
-    return render_template('order.html', order=order, totalprice=float(order.total_cost()))
+    return render_template('basket.html', order=order, totalprice=float(order.total_cost()))
 
 @bp.post('/basket/<int:item_id>/')
 def adding_to_basket(item_id):
