@@ -3,32 +3,6 @@ from datetime import datetime
 from typing import List
 from enum import Enum
 
-class OldCity:
-    def __init__(self, id, name, description, image):
-        self.id = id
-        self.name = name
-        self.description = description
-        self.image = image
-
-    def get_city_details(self):
-        return str(self)
-
-    def __repr__(self):
-        str = "ID: {}, Name: {}, Description: {}, Image: {} \n" 
-        str = str.format( self.id, self.name, self.description, self.image)
-        return str
-
-# we can save ourselves some time by using the dataclass decorator
-# to create the class and its methods
-# this will create the __init__ and __repr__ methods for us
-# and we can add our own methods as needed
-@dataclass
-class City:
-    id: str
-    name: str
-    description: str = 'fooobar'
-    image: str = 'foobar.png'
-
 @dataclass
 class Item:
     id: str
@@ -36,20 +10,10 @@ class Item:
     description: str
     category: str  
     price: float
+    is_available: bool
     image: str = 'foobar.png'
+   
 
-
-@dataclass
-class Tour:
-    id: str
-    name: str
-    description: str
-    city: City
-    image: str = 'foobar.png'
-    price: float = 10.00
-    date: datetime = field(
-        default_factory=lambda: datetime.now()
-    )
 
 class OrderStatus(Enum):
     PENDING = 'Pending'

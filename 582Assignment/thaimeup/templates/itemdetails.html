@@ -17,7 +17,8 @@
                     <p class="card-text">{{ item.description }}</p>
                     <p class="card-text mt-auto float-end text-danger">Price: ${{ item.price }}</p>
                 </div>
-
+                
+                {% if item.is_available %}
                 <div class="card-footer bg-white border-top-0">
                     <form method="POST" action="{{ url_for('main.adding_to_basket', item_id=item.id) }}">
                         <button type="submit" class="btn w-100"
@@ -26,6 +27,13 @@
                         </button>
                     </form>
                 </div>
+                {% else %}
+                <div class="card-footer bg-white border-top-0">
+                    <button type="button" class="btn btn-secondary w-100"
+                    style="height: 50px;"
+                    disabled>Sold Out</button>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
