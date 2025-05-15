@@ -1,16 +1,13 @@
 {% extends 'base.html' %}
 {% import 'bootstrap5/form.html' as wtf %}
-
 {% block main %}
 <section class="shadow-sm mb-5 mt-5">
   <div class="container">
     <div class="row">
       <div class="col-12">
         <h1>Checkout</h1>
-
         <form method="POST" action="{{ url_for('main.checkout') }}">
           {{ form.hidden_tag() }}
-
           <div class="row">
             <!-- 🧾 Order Summary -->
             <div class="col card m-3 p-3">
@@ -32,12 +29,12 @@
                 <h2>Total: ${{ "%.2f"|format(totalprice) }}</h2>
               </div>
             </div>
-
-            <!-- 🚚 Delivery + 💳 Payment + 📞 Contact -->
+          </div>  
+          <!-- 🚚 Delivery + 💳 Payment + 📞 Contact -->
+          <div class="row">
             <div class="col card m-3 p-3">
               <h4>Delivery Information</h4>
               <hr>
-
               <!-- Delivery Method -->
               <legend class="mt-3">Delivery method</legend>
               <div class="form-check">
@@ -52,7 +49,6 @@
                 <input class="form-check-input" type="radio" name="delivery_method" value="eco">
                 <label class="form-check-label">Eco-Delivery (+$5.00)</label>
               </div>
-
               <!-- Payment Method -->
               <legend>Payment method</legend>
               <div class="form-check">
@@ -67,59 +63,23 @@
                 <input class="form-check-input" type="radio" name="payment_method" value="creditcard">
                 <label class="form-check-label">Credit/Debit Card</label>
               </div>
-
               <!-- Contact Info -->
               <legend>Contact Details</legend>
               <form method="POST" action="{{ url_for('main.checkout') }}" novalidate
                 class="{% if was_validated %}was-validated{% endif %}">
                 {{ form.hidden_tag() }}
-
-                <div class="mb-3">
-                  <label for="firstname">First name</label>
-                  <input type="text" class="form-control" id="firstname" name="firstname"
-                    value="{{ session.get('firstname', '') }}" required>
-                  <div class="invalid-feedback">Please enter your first name.</div>
+                <div class="col-md-6">
+                  {{ wtf.render_form(form) }}
                 </div>
-
-                <div class="mb-3">
-                  <label for="surname">Last name</label>
-                  <input type="text" class="form-control" id="surname" name="surname"
-                    value="{{ session.get('surname', '') }}" required>
-                  <div class="invalid-feedback">Please enter your last name.</div>
-                </div>
-
-                <div class="mb-3">
-                  <label for="email">Email</label>
-                  <input type="email" class="form-control" id="email" name="email"
-                    value="{{ session.get('email', '') }}" required>
-                  <div class="invalid-feedback">Please enter a valid email address.</div>
-                </div>
-
-                <div class="mb-3">
-                  <label for="phone">Phone</label>
-                  <input type="text" class="form-control" id="phone" name="phone" value="{{ session.get('phone', '') }}"
-                    required>
-                  <div class="invalid-feedback">Please enter your phone number.</div>
-                </div>
-
-                <div class="mb-3">
-                  <label for="address">Address</label>
-                  <input type="text" class="form-control" id="address" name="address" value="" required>
-                  <div class="invalid-feedback">Please enter your address.</div>
-                </div>
-
                 <div class="mt-4">
                   <button type="submit" class="btn btn-success btn-lg px-4 w-100">
                     <i class="bi bi-check-circle me-2"></i>Place Order
                   </button>
                 </div>
               </form>
-
-
             </div>
           </div>
         </form>
-
       </div>
     </div>
   </div>

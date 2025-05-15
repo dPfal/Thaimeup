@@ -118,28 +118,25 @@ def checkout():
     if request.method == 'GET' and user:
         form.firstname.data = user.info.firstname
         form.surname.data = user.info.surname
-        form.email.data = user.info.email
         form.phone.data = user.info.phone
         form.address.data = getattr(user.info, 'address', '')
-
+    
     if request.method == 'POST':
         if form.validate_on_submit():
             order.status = True
             order.firstname = form.firstname.data
             order.surname = form.surname.data
-            order.email = form.email.data
             order.phone = form.phone.data
             order.address = form.address.data
-
             flash('Thank you for your information, your order is being processed!')
             order = convert_basket_to_order(order)
             empty_basket()
             add_order(order)
             return redirect(url_for('main.index'))
         else:
-            flash('Please correct the form errors.', 'error')
-
+            flash('The provided information is missing or incorrect. Please complete the fields correctly to process your order.', 'error')
     return render_template('checkout.html', form=form, order=order, totalprice=totalprice)
+
 
 
 @bp.route('/login/', methods = ['POST', 'GET'])

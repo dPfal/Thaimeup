@@ -6,10 +6,8 @@ class CheckoutForm(FlaskForm):
     """Form for user checkout."""
     firstname = StringField("First name", validators = [InputRequired()])
     surname = StringField("Lastname", validators = [InputRequired()])
-    email = StringField("Email", validators = [InputRequired(), email()])
     phone = StringField("Phone Number", validators = [InputRequired()])
     address = StringField("Address", validators = [InputRequired()])
-    submit = SubmitField("Place Order")
 
 class LoginForm(FlaskForm):
     """Form for user login."""
