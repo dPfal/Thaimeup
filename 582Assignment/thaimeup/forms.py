@@ -39,9 +39,4 @@ class EditItemForm(FlaskForm):
     description = TextAreaField("Description", validators=[InputRequired()])
     price = DecimalField("Price", places=2, validators=[InputRequired(), NumberRange(min=0)])
     category = SelectField("Category", coerce=int, validators=[InputRequired()])
-    is_available = SelectField(
-        "Availability",
-        choices=[('1', 'Available'), ('0', 'Sold Out')],
-        validators=[InputRequired()]
-    )
     submit = SubmitField("Save Changes")

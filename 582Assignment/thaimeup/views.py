@@ -228,19 +228,27 @@ def edit_menu(item_id):
         form.description.data = item.description
         form.price.data = item.price
         form.category.data = item.category
-        form.is_available.data = str(item.is_available)     
 
     elif form.validate_on_submit():
+        # ✅ 로그 출력
+        print("🔄 Updating item:")
+        print(" - name:", form.name.data)
+        print(" - description:", form.description.data)
+        print(" - price:", form.price.data)
+        print(" - category:", form.category.data)
         update_item(
             item_id,
             form.name.data,
             form.description.data,
             float(form.price.data),
-            form.category.data,
-            int(form.is_available.data)
-        )
+            form.category.data
+            )
         flash("Menu updated.")
         return redirect(url_for("main.edit_menu", item_id=item_id))
+    else:
+        flash("Fail.")
+        print(form.errors)
+
 
     return render_template("edit_item_admin.html", form=form, item=item)
 

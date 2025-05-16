@@ -111,16 +111,23 @@ def insert_item(name, description, price,image,category_id, is_available):
     mysql.connection.commit()
     cur.close()
 
-def update_item(item_id, new_name, new_description, new_price):
+def update_item(item_id, new_name, new_description, new_price, new_category_id):
+    print(f"[DB] Updating item {item_id}...")
+    print(f"name={new_name}, price={new_price}, category={new_category_id}")
+    
     cur = mysql.connection.cursor()
     sql = """
         UPDATE items
-        SET name = %s, description = %s, price=%s
+        SET name = %s,
+            description = %s,
+            price = %s,
+            category_id = %s
         WHERE item_id = %s
     """
-    cur.execute(sql, (new_name, new_description, new_price, item_id,))
+    cur.execute(sql, (new_name, new_description, new_price, new_category_id, item_id))
     mysql.connection.commit()
     cur.close()
+    print("[DB] ✅ Commit complete")
 
 def delete_item(item_id):
     cur = mysql.connection.cursor()
