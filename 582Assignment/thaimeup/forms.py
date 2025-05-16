@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms.fields import SubmitField, StringField, PasswordField
-from wtforms.validators import InputRequired, email
+from wtforms.fields import SubmitField, StringField, PasswordField,SelectField,DecimalField,TextAreaField
+from wtforms.validators import InputRequired, email, NumberRange
 
 class CheckoutForm(FlaskForm):
     """Form for user checkout."""
@@ -24,3 +24,24 @@ class RegisterForm(FlaskForm):
     surname = StringField("Your surname", validators = [InputRequired()])
     phone = StringField("Your phone number", validators = [InputRequired()])
     submit = SubmitField("Make Account")
+
+class AddItemForm(FlaskForm):
+    name = StringField("Menu Name", validators=[InputRequired()])
+    description = TextAreaField("Description", validators=[InputRequired()])
+    price = DecimalField("Price", validators=[InputRequired(), NumberRange(min=0)])
+    category = SelectField("Category", coerce=int, validators=[InputRequired()])
+    is_available = SelectField("Availability", choices=[('1', 'Available'), ('0', 'Sold Out')], validators=[InputRequired()])
+    submit = SubmitField("Add Item")
+
+
+class EditItemForm(FlaskForm):
+    name = StringField("Menu Name", validators=[InputRequired()])
+    description = TextAreaField("Description", validators=[InputRequired()])
+    price = DecimalField("Price", places=2, validators=[InputRequired(), NumberRange(min=0)])
+    category = SelectField("Category", coerce=int, validators=[InputRequired()])
+    is_available = SelectField(
+        "Availability",
+        choices=[('1', 'Available'), ('0', 'Sold Out')],
+        validators=[InputRequired()]
+    )
+    submit = SubmitField("Save Changes")

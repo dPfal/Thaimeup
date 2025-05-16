@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<section class="shadow-sm mb-5">
+    <div class="text-dark text-center">
+        <p class="h3 text-dark mb-4">Edit Menu</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-5 mb-4">
+            <div class="card h-100 d-flex flex-column">
+                <img class="card-img-top" src="{{ url_for('static', filename='img/' + item.image) }}" alt="Card image">
+
+                <form method="POST" action="{{ url_for('main.edit_menu', item_id=item.id) }}">
+                    {{ form.hidden_tag() }}
+
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-3">
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows=4) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.price.label(class="form-label") }}
+                            {{ form.price(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-white border-top-0">
+                        {{ form.submit(class="btn btn-success w-100", style="height: 50px;") }}
+                    </div>
+                </form>
+
+                {% if item.is_available %}
+                <form method="POST" action="{{ url_for('main.mark_unavailable', item_id=item.id) }}">
+                    <div class="card-footer bg-white border-top-0 mt-2">
+                        <button type="submit" class="btn btn-outline-secondary w-100" style="height: 50px;">
+                            Mark as Sold Out
+                        </button>
+                    </div>
+                </form>
+                {% else %}
+                <form method="POST" action="{{ url_for('main.mark_available', item_id=item.id) }}">
+                    <div class="card-footer bg-white border-top-0 mt-2">
+                        <button type="submit" class="btn btn-outline-success w-100" style="height: 50px;">
+                            Mark as Available
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('main.delete_menu', item_id=item.id) }}">
+                    <div class="card-footer bg-white border-top-0 mt-2">
+                        <button type="submit" class="btn btn-danger w-100" style="height: 50px;">
+                            Delete Menu
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

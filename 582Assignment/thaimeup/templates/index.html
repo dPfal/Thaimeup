@@ -66,7 +66,6 @@
     }
 </style>
 
-<!-- Category Buttons -->
 <div class="text-center mb-4">
     <form method="GET" action="{{ url_for('main.index') }}">
         <div class="row justify-content-center">
@@ -85,7 +84,6 @@
     </form>
 </div>
 
-<!-- Item List -->
 <section class="shadow-sm p-5" id="items">
     <div class="row ps-2 pe-2">
         {% if items %}
@@ -93,9 +91,11 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100 d-flex flex-column">
                 <a href="{{ url_for('main.itemdetails', itemid=item.id) }}" class="text-decoration-none text-dark">
-                    <img class="card-img-top" src="{{ url_for('static', filename='img/' + item.image) }}"
-                        alt="{{ item.name }}">
-
+                    {% if item.image %}
+                    <img class="card-img-top" src="{{ url_for('static', filename='img/' + item.image) }}">
+                    {% else %}
+                    <img class="card-img-top" src="{{ url_for('static', filename='img/padthai.jpeg') }}">
+                    {% endif %}
                     <div class="card-body d-flex flex-column">
                         <h4 class="card-title">{{ item.name }}</h4>
                         <p class="card-text">{{ item.description }}</p>

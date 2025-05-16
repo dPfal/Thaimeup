@@ -94,3 +94,48 @@ def add_user(form):
                     )
         )
     )
+
+def get_categories():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT category_id, category_name FROM categories")
+    categories = cur.fetchall()
+    cur.close()
+    return [(c['category_id'], c['category_name']) for c in categories]
+
+def insert_item(name, description, price,image,category_id, is_available):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        INSERT INTO items (name, description, price,image, category_id, is_available)
+        VALUES (%s, %s, %s, %s, %s,%s)
+    """, (name, description, price,image, category_id, is_available))
+    mysql.connection.commit()
+    cur.close()
+
+def update_item(item_id, new_name, new_description, new_price):
+    cur = mysql.connection.cursor()
+    sql = """
+        UPDATE items
+        SET name = %s, description = %s, price=%s
+        WHERE item_id = %s
+    """
+    cur.execute(sql, (new_name, new_description, new_price, item_id,))
+    mysql.connection.commit()
+    cur.close()
+
+def delete_item(item_id):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM items WHERE item_id = %s", (item_id,))
+    mysql.connection.commit()
+    cur.close()
+
+def mark_item_as_available(item_id):
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE items SET is_available = 1 WHERE item_id = %s", (item_id,))
+    mysql.connection.commit()
+    cur.close()
+
+def mark_item_as_unavailable(item_id):
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE items SET is_available = 0 WHERE item_id = %s", (item_id,))
+    mysql.connection.commit()
+    cur.close()    

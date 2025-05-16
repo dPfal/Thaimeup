@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, request, session, flash
-from flask import redirect, url_for
+from flask import redirect, url_for,abort
 from thaimeup import mysql
 from thaimeup.db import add_order, get_orders, check_for_user, add_user
-from thaimeup.db import get_items, get_item, get_user_by_id
+from thaimeup.db import get_items, get_item, get_user_by_id, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_item,get_categories
 from thaimeup.session import get_basket, add_to_basket, empty_basket, convert_basket_to_order
-from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm
+from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddItemForm,EditItemForm
 
 bp = Blueprint('main', __name__)
 
@@ -154,7 +154,6 @@ def login():
                 flash('Invalid username or password', 'error')
                 return redirect(url_for('main.login'))
 
-            # Store user information in the session
             session['firstname'] = user.info.firstname
             session['surname'] = user.info.surname
             session['email'] = user.info.email
@@ -197,18 +196,69 @@ def register():
 
     return render_template('register.html', form = form)
 
-@bp.route('/testdb/')
-def test_db_connection():
-    try:
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM items")
-        results = cur.fetchall()
-        cur.close()
+@bp.route('/admin/add/', methods=['GET', 'POST'])
+def add_item():
+    form = AddItemForm()
+    form.category.choices = get_categories()
 
-        if not results:
-            return "✅ DB connected, but no data found."
+    if form.validate_on_submit():
+        name = form.name.data
+        description = form.description.data
+        price = float(form.price.data)
+        category_id = form.category.data
+        is_available = int(form.is_available.data)
+        image = name.lower().replace(" ", "") + ".jpeg"
+        insert_item(name, description, price,image, category_id, is_available)
+        flash("Item added successfully.")
+        return redirect(url_for('main.index'))
 
-        return f"✅ DB connected! Results: <br>" + "<br>".join([str(row) for row in results])
+    return render_template('add_item_admin.html', form=form)
 
-    except Exception as e:
-        return f"❌ DB connection failed: {e}"
+@bp.route('/admin/edit/<int:item_id>/', methods=['GET', 'POST'])
+def edit_menu(item_id):
+    item = get_item(item_id)
+    if not item:
+        abort(404)
+
+    form = EditItemForm()
+    form.category.choices = get_categories()  
+
+    if request.method == 'GET':
+        form.name.data = item.name
+        form.description.data = item.description
+        form.price.data = item.price
+        form.category.data = item.category
+        form.is_available.data = str(item.is_available)     
+
+    elif form.validate_on_submit():
+        update_item(
+            item_id,
+            form.name.data,
+            form.description.data,
+            float(form.price.data),
+            form.category.data,
+            int(form.is_available.data)
+        )
+        flash("Menu updated.")
+        return redirect(url_for("main.edit_menu", item_id=item_id))
+
+    return render_template("edit_item_admin.html", form=form, item=item)
+
+
+@bp.route('/admin/delete/<int:item_id>/', methods=['POST'])
+def delete_menu(item_id):
+    delete_item(item_id)
+    flash('Item deleted.')
+    return redirect(url_for('main.index'))
+
+@bp.route('/admin/unavailable/<int:item_id>/', methods=['POST'])
+def mark_unavailable(item_id):
+    mark_item_as_unavailable(item_id)
+    flash('Item marked as sold out.')
+    return redirect(url_for('main.edit_menu', item_id=item_id))
+
+@bp.route('/admin/available/<int:item_id>/', methods=['POST'])
+def mark_available(item_id):
+    mark_item_as_available(item_id)
+    flash('Item is now available for sale.')
+    return redirect(url_for('main.edit_menu', item_id=item_id))

@@ -10,7 +10,6 @@ def get_user():
     return session.get('user', DummyUserInfo)
 
 def get_basket():
-    
     basket_data = session.get('basket', {})
     tmp = Basket()
     for item in basket_data.get('items', []):
@@ -23,6 +22,10 @@ def add_to_basket(item_id, quantity=1):
     session.setdefault('basket', {"items": []})
     basket = get_basket()
     item_obj = get_item(item_id)
+
+    print("[DEBUG] Current basket items:")
+    for item in basket.items:
+        print(" - item.item:", item.item, "| item.id:", getattr(item.item, 'id', 'N/A'))
 
     found = False
     for item in basket.items:
