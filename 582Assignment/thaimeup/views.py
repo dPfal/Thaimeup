@@ -159,6 +159,8 @@ def login():
             session['email'] = user.info.email
             session['phone'] = user.info.phone
             session['logged_in'] = True
+            username = form.username.data
+            session['is_admin'] = 'admin' in username.lower()
             flash('Login successful!')
             return redirect(url_for('main.index'))
 
@@ -221,37 +223,35 @@ def edit_menu(item_id):
         abort(404)
 
     form = EditItemForm()
-    form.category.choices = get_categories()  
+    form.category.choices = get_categories()
 
-    if request.method == 'GET':
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            print("🔄 Updating item:")
+            print(" - name:", form.name.data)
+            print(" - description:", form.description.data)
+            print(" - price:", form.price.data)
+            print(" - category:", form.category.data)
+            update_item(
+                item_id,
+                form.name.data,
+                form.description.data,
+                float(form.price.data),
+                form.category.data
+                )
+            flash("Menu updated.")
+            return redirect(url_for("main.edit_menu", item_id=item_id))
+        else:
+            flash("Fail.")
+            print(form.errors)
+
+    elif request.method == 'GET':
         form.name.data = item.name
         form.description.data = item.description
         form.price.data = item.price
         form.category.data = item.category
 
-    elif form.validate_on_submit():
-        # ✅ 로그 출력
-        print("🔄 Updating item:")
-        print(" - name:", form.name.data)
-        print(" - description:", form.description.data)
-        print(" - price:", form.price.data)
-        print(" - category:", form.category.data)
-        update_item(
-            item_id,
-            form.name.data,
-            form.description.data,
-            float(form.price.data),
-            form.category.data
-            )
-        flash("Menu updated.")
-        return redirect(url_for("main.edit_menu", item_id=item_id))
-    else:
-        flash("Fail.")
-        print(form.errors)
-
-
     return render_template("edit_item_admin.html", form=form, item=item)
-
 
 @bp.route('/admin/delete/<int:item_id>/', methods=['POST'])
 def delete_menu(item_id):

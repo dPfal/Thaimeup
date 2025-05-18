@@ -83,7 +83,11 @@
         </div>
     </form>
 </div>
-
+{% if session.get('is_admin') %}
+<div class="d-flex justify-content-center mb-4">
+    <a href="{{ url_for('main.add_item') }}" class="btn button px-4" style="width: auto;">+ Add New Item</a>
+</div>
+{% endif %}
 <section class="shadow-sm p-5" id="items">
     <div class="row ps-2 pe-2">
         {% if items %}
@@ -111,6 +115,13 @@
                 {% else %}
                 <div class="card-footer bg-white border-top-0">
                     <button type="button" class="btn btn-secondary w-100" disabled>Sold Out</button>
+                </div>
+                {% endif %}
+                {% if session.get('is_admin') %}
+                <div class="card-footer bg-white border-top-0">
+                    <a href="{{ url_for('main.edit_menu', item_id=item.id) }}">
+                        <button class="btn button w-100">Edit Menu</button>
+                    </a>
                 </div>
                 {% endif %}
             </div>
