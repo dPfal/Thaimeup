@@ -4,7 +4,7 @@
 <div class="d-flex justify-content-center">
     <img src="{{ url_for('static', filename='img/1.png') }}" class="img-fluid" alt="Responsive image">
 </div>
-
+<br>
 <h1>Registered Orders</h1>
 {% endblock %}
 
@@ -21,13 +21,14 @@
                 <span class="text-danger">Pending</span>
             {% endif %}
             )
+            <br>
         </h2>
     </div>
 
     <div>
         <p>
             <strong>Order Date:</strong> {{ order.date.strftime('%Y-%m-%d') }}<br>
-            <span>Total Price: ${{ "%.2f"|format(order.total_cost) }}</span>
+            <strong>Total Price: </strong> ${{ "%.2f"|format(order.total_cost) }}<br>
         </p>
     </div>
 
@@ -40,7 +41,7 @@
     </div>
 
     <div class="row p-2 justify-content-start">
-        <h3 class="lead">Ordered Items:</h3>
+        <h4 class="lead">Ordered Items:</h4>
         {% for item in order.items %}
         <div class="d-flex align-items-center mb-3">
             <img src="{{ url_for('static', filename='img/' + item.item.image) }}" class="img-thumbnail" width="100px">

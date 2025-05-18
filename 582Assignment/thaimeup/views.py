@@ -103,7 +103,7 @@ def update_basket_quantity(item_id, action):
     }
     return redirect(url_for('main.order'))
 
-@bp.route('/orders/')
+@bp.route('/admin/orders/')
 def orders():
     orders = get_orders()
     return render_template('orders.html', orders = orders)
