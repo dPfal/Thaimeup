@@ -1,5 +1,5 @@
 
-from thaimeup.models import Order, OrderStatus, UserInfo, Item
+from thaimeup.models import Order, OrderStatus, UserInfo, Item, BasketItem
 from thaimeup.models import UserAccount
 from datetime import datetime
 from flask import Flask
@@ -9,12 +9,34 @@ DummyUserInfo = UserInfo(
     '0', 'Dummy', 'Foobar', 'dummy@foobar.com', '1234567890'
 )
 
+dummy_item1 = Item(
+    id="1",
+    name="Burger",
+    description="Juicy grilled beef burger",
+    category="Food",
+    price=9.99,
+    is_available=True,
+    image="padthai.jpeg"
+)
+
+dummy_item2 = Item(
+    id="2",
+    name="Fries",
+    description="Crispy golden fries",
+    category="Side",
+    price=4.99,
+    is_available=True,
+    image="somtum.jpeg"
+)
+
+basket_item1 = BasketItem(id="b1", item=dummy_item1, quantity=2)
+basket_item2 = BasketItem(id="b2", item=dummy_item2, quantity=3)
+
 Orders = [
     Order('1', OrderStatus.PENDING, DummyUserInfo, 149.99,
-          []),  
-    Order('2', OrderStatus.CONFIRMED, DummyUserInfo, 1000.00,
-          []) 
-]
+          [basket_item1, basket_item2]),  
+    Order('2', OrderStatus.PENDING, DummyUserInfo, 1000.00,[basket_item1])
+    ]
 
 Users = [
     UserAccount('admin', 'admin', 'foobar@mail.com', 
@@ -50,7 +72,8 @@ def get_item(item_id):
     """, (item_id,))     
     row = cur.fetchone()
     cur.close()
-    return Item(str(row['item_id']), row['name'], row['description'], row['category_name'], row['price'], bool(row['is_available']), row['image']) if row else None
+    return Item(str(row['item_id']), row['name'], row['description'], row['category_name'],
+                 row['price'], bool(row['is_available']), row['image']) if row else None
 
 def add_order(order):
     """Add a new order."""
@@ -66,7 +89,21 @@ def get_order(order_id):
     for order in Orders:
         if order.id == order_id:
             return order
-    return None  # or raise an exception if preferred
+    return None  # or raise an exception if preferred
+
+def mark_order_as_pending(order_id):
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE orders SET status = 0 WHERE order_id = %s", (order_id,))
+    mysql.connection.commit()
+    cur.close()
+
+def mark_order_as_completed(order_id):
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE orders SET status = 1 WHERE order_id = %s", (order_id,))
+    mysql.connection.commit()
+    cur.close()  
+
+
 
 def get_user_by_id(user_id):
     """Find a UserAccount by user_id."""

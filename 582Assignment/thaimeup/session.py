@@ -67,4 +67,6 @@ def convert_basket_to_order(basket):
         total_cost= basket.total_cost(),
         items = basket.items,
     )
+
+    print('Order created: {}'.format(order))
     return order

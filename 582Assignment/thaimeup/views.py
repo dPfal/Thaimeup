@@ -103,6 +103,11 @@ def update_basket_quantity(item_id, action):
     }
     return redirect(url_for('main.order'))
 
+@bp.route('/orders/')
+def orders():
+    orders = get_orders()
+    return render_template('orders.html', orders = orders)
+
 @bp.route('/checkout/', methods=['POST', 'GET'])
 def checkout():
     if not session.get('logged_in'):
@@ -136,7 +141,6 @@ def checkout():
         else:
             flash('The provided information is missing or incorrect. Please complete the fields correctly to process your order.', 'error')
     return render_template('checkout.html', form=form, order=order, totalprice=totalprice)
-
 
 
 @bp.route('/login/', methods = ['POST', 'GET'])

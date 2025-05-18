@@ -16,10 +16,16 @@ class Item:
 
 
 class OrderStatus(Enum):
-    PENDING = 'Pending'
-    CONFIRMED = 'Confirmed'
-    CANCELLED = 'Cancelled'
+    PENDING = 'pending'
+    COMPLETED = 'completed'
+    #status: bool
 
+    def is_pending(self):
+        return self == OrderStatus.PENDING
+    
+    def is_completed(self):
+        return self == OrderStatus.COMPLETED
+    
 @dataclass
 class UserInfo:
     id: str

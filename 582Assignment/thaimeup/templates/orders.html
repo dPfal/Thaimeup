@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<div class="d-flex justify-content-center">
+    <img src="{{ url_for('static', filename='img/1.png') }}" class="img-fluid" alt="Responsive image">
+</div>
+
+<h1>Registered Orders</h1>
+{% endblock %}
+
+{% block main %}
+{% for order in orders %}
+<section class="shadow-sm p-5 mb-2 pb-0" id="{{ order.id }}">
+    <div>
+        <h2 class="display-6 text-left">
+            Order ID: {{ order.id }}
+            (
+            {% if order.status.is_completed() %}
+                <span class="text-success">Completed</span>
+            {% else %}
+                <span class="text-danger">Pending</span>
+            {% endif %}
+            )
+        </h2>
+    </div>
+
+    <div>
+        <p>
+            <strong>Order Date:</strong> {{ order.date.strftime('%Y-%m-%d') }}<br>
+            <span>Total Price: ${{ "%.2f"|format(order.total_cost) }}</span>
+        </p>
+    </div>
+
+    <div class="mb-3">
+        <h4 class="text-left">Contact Details:</h4>
+        <p>
+            <strong>Name:</strong> {{ order.user.firstname }} {{ order.user.surname }}<br>
+            <strong>Phone:</strong> {{ order.user.phone }}<br>
+        </p>
+    </div>
+
+    <div class="row p-2 justify-content-start">
+        <h3 class="lead">Ordered Items:</h3>
+        {% for item in order.items %}
+        <div class="d-flex align-items-center mb-3">
+            <img src="{{ url_for('static', filename='img/' + item.item.image) }}" class="img-thumbnail" width="100px">
+            <div class="ms-3">
+                <b>{{ item.item.name }}</b><br>
+                <span>Quantity: {{ item.quantity }}</span><br>
+                <span>Total: ${{ "%.2f"|format(item.total_price()) }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endfor %}
+{% endblock %}
