@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
 from thaimeup import mysql
-from thaimeup.db import add_order, get_orders, check_for_user, add_user
+from thaimeup.db import add_order, get_orders, check_for_user, regirster_new_user
 from thaimeup.db import get_items, get_item, get_user_by_id, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_item,get_categories
 from thaimeup.session import get_basket, add_to_basket, empty_basket, convert_basket_to_order
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddItemForm,EditItemForm
+from thaimeup.models import UserAccount,UserInfo
+from werkzeug.security import generate_password_hash, check_password_hash
 
 bp = Blueprint('main', __name__)
 
@@ -184,7 +186,7 @@ def register():
     if request.method == 'POST':
 
         if form.validate_on_submit():
-
+   
             # Check if the user already exists
             user = check_for_user(
                 form.username.data, form.password.data
@@ -194,9 +196,31 @@ def register():
                 return redirect(url_for('main.register'))
 
             # Store user information in the database
-            add_user(
-                form
+          #  add_user(
+           #     form
+           # )
+            newUserinfo = UserInfo(
+                id= None,    
+                firstname = form.firstname.data,
+                surname = form.surname.data,
+                email = form.email.data,
+                phone = form.phone.data
             )
+
+            hashed_pw = generate_password_hash(form.password.data)
+                        
+
+            newuser = UserAccount(
+                    
+                username = form.username.data,
+                password = hashed_pw,
+                info = newUserinfo
+            ) 
+
+            regirster_new_user(newuser)
+
+
+
             flash('Registration successful!')
             return redirect(url_for('main.login'))
 

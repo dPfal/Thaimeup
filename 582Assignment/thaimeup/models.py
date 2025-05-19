@@ -34,6 +34,12 @@ class UserInfo:
     email: str
     phone: str
 
+@dataclass
+class UserAccount:
+    username: str
+    password: str
+    info: UserInfo
+
 @dataclass 
 class BasketItem:
     id: str
@@ -95,9 +101,3 @@ class Order:
         init=True)
     
 
-@dataclass
-class UserAccount:
-    username: str
-    password: str
-    email: str
-    info: UserInfo

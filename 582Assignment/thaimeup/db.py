@@ -39,10 +39,9 @@ Orders = [
     ]
 
 Users = [
-    UserAccount('admin', 'admin', 'foobar@mail.com', 
-                UserInfo('1', 'Admin', 'User', 'foobar@mail.com', 
-                         '1234567890')
-    ),
+    UserAccount('admin', 'admin', 
+                UserInfo('1', 'Admin', 'User', 'foobar@mail.com','1234567890')
+    )
 ]
 
 def get_items():
@@ -112,6 +111,19 @@ def get_user_by_id(user_id):
             return user
     return None
 
+def check_for_user(username):
+    """Check if the username and password are valid."""
+    cur = mysql.connection.cursor()
+    cur.execute('Select * FROM accountdetails WHERE username = %s',(username))
+    user = cur.fetchone()
+    cur.close
+        # never store passwords in plain text in production code
+        # this is just for demonstration purposes
+    if user:
+        return False
+    else:
+        return True
+
 def check_for_user(username, password):
     """Check if the username and password are valid."""
     for user in Users:
@@ -120,6 +132,22 @@ def check_for_user(username, password):
         if user.username == username and user.password == password:
             return user
     return None  # or raise an exception if preferred
+
+def regirster_new_user(new_user):
+    cur = mysql.connection.cursor()
+
+    cur.execute("INSERT INTO users(first_name,last_name,username,password_hash,email)" \
+    " VALUES(%s,%s,%s,%s,%s)", 
+    (new_user.info.firstname,
+     new_user.info.surname,
+     new_user.username, 
+     new_user.password,
+     new_user.info.email,
+     #new_user.info.phone
+     ))
+    mysql.connection.commit()
+    cur.close()
+    return True
 
 def add_user(form):
     """Add a new user."""
