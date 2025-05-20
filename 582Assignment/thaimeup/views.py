@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
 from thaimeup import mysql
-from thaimeup.db import add_order, get_orders, check_for_user, regirster_new_user
+from thaimeup.db import add_order, get_orders, check_for_user, check_user_exists, add_user, is_admin
 from thaimeup.db import get_items, get_item, get_user_by_id, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_item,get_categories
 from thaimeup.session import get_basket, add_to_basket, empty_basket, convert_basket_to_order
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddItemForm,EditItemForm
 from thaimeup.models import UserAccount,UserInfo
-from werkzeug.security import generate_password_hash, check_password_hash
+from hashlib import sha256
 
 bp = Blueprint('main', __name__)
 
@@ -64,16 +64,13 @@ def clear_basket():
 
 @bp.post('/removebasketitem/<int:item_id>/')
 def remove_basketitem(item_id):
-    print('User wants to delete basket item with id={}'.format(item_id))
-        # Retrieve the current basket data
+    print(f'User wants to delete basket item with id={item_id}')
     basket_data = session.get('basket', {"items": []})
-
-    # Remove the item from the basket
-    basket_data["items"] = [item for item in basket_data["items"] if item["id"] != item_id]
-
-    # Update the session with the modified basket
-    session['basket'] = basket_data
+    basket_data["items"] = [item for item in basket_data["items"] if str(item["id"]) != str(item_id)]
+    session["basket"] = basket_data
+    session.modified = True 
     return redirect(url_for('main.order'))
+
 
 @bp.post('/updatebasket/<int:item_id>/<string:action>/')
 def update_basket_quantity(item_id, action):
@@ -120,13 +117,12 @@ def checkout():
     order = get_basket()
     totalprice = order.total_cost()
 
-    user = get_user_by_id(session.get('user_id'))
-
-    if request.method == 'GET' and user:
-        form.firstname.data = user.info.firstname
-        form.surname.data = user.info.surname
-        form.phone.data = user.info.phone
-        form.address.data = getattr(user.info, 'address', '')
+    if request.method == 'GET':
+        user = session.get('user')
+        if user:
+            form.firstname.data = user.get('firstname', '')
+            form.surname.data = user.get('surname', '')
+            form.phone.data = user.get('phone', '')
     
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -145,32 +141,33 @@ def checkout():
     return render_template('checkout.html', form=form, order=order, totalprice=totalprice)
 
 
-@bp.route('/login/', methods = ['POST', 'GET'])
+@bp.route('/login/', methods=['POST', 'GET'])
 def login():
     form = LoginForm()
+
     if request.method == 'POST':
-
         if form.validate_on_submit():
-
-            # Check if the user exists in the database
-            user = check_for_user(
-                form.username.data, form.password.data
-            )
+            form.password.data = sha256(form.password.data.encode()).hexdigest()
+            user = check_for_user(form.username.data, form.password.data)
             if not user:
                 flash('Invalid username or password', 'error')
                 return redirect(url_for('main.login'))
 
-            session['firstname'] = user.info.firstname
-            session['surname'] = user.info.surname
-            session['email'] = user.info.email
-            session['phone'] = user.info.phone
+            # Store full user info in session
+            session['user'] = {
+                'user_id': user.info.id,
+                'firstname': user.info.firstname,
+                'surname': user.info.surname,
+                'email': user.info.email,
+                'phone': user.info.phone,
+                'is_admin': is_admin(user.username),
+            }
+            session['is_admin'] = is_admin(user.username)
             session['logged_in'] = True
-            username = form.username.data
-            session['is_admin'] = 'admin' in username.lower()
             flash('Login successful!')
             return redirect(url_for('main.index'))
 
-    return render_template('login.html', form = form)
+    return render_template('login.html', form=form)
 
 @bp.route('/logout/')
 def logout():
@@ -180,51 +177,23 @@ def logout():
     
     return render_template('logout.html')
 
-@bp.route('/register/', methods = ['POST', 'GET'])
+@bp.route('/register/', methods=['POST', 'GET'])
 def register():
     form = RegisterForm()
     if request.method == 'POST':
-
         if form.validate_on_submit():
-   
+            form.password.data = sha256(form.password.data.encode()).hexdigest()
             # Check if the user already exists
-            user = check_for_user(
-                form.username.data, form.password.data
-            )
+            user = check_user_exists(form.username.data, form.email.data, form.phone.data)
             if user:
                 flash('User already exists', 'error')
                 return redirect(url_for('main.register'))
 
-            # Store user information in the database
-          #  add_user(
-           #     form
-           # )
-            newUserinfo = UserInfo(
-                id= None,    
-                firstname = form.firstname.data,
-                surname = form.surname.data,
-                email = form.email.data,
-                phone = form.phone.data
-            )
-
-            hashed_pw = generate_password_hash(form.password.data)
-                        
-
-            newuser = UserAccount(
-                    
-                username = form.username.data,
-                password = hashed_pw,
-                info = newUserinfo
-            ) 
-
-            regirster_new_user(newuser)
-
-
-
+            add_user(form)
             flash('Registration successful!')
             return redirect(url_for('main.login'))
 
-    return render_template('register.html', form = form)
+    return render_template('register.html', form=form)
 
 @bp.route('/admin/add/', methods=['GET', 'POST'])
 def add_item():

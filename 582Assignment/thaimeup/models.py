@@ -38,6 +38,7 @@ class UserInfo:
 class UserAccount:
     username: str
     password: str
+    email: str
     info: UserInfo
 
 @dataclass 

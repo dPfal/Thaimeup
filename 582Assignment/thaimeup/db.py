@@ -5,9 +5,7 @@ from datetime import datetime
 from flask import Flask
 from . import mysql
 
-DummyUserInfo = UserInfo(
-    '0', 'Dummy', 'Foobar', 'dummy@foobar.com', '1234567890'
-)
+DummyUserInfo = []
 
 dummy_item1 = Item(
     id="1",
@@ -33,16 +31,9 @@ basket_item1 = BasketItem(id="b1", item=dummy_item1, quantity=2)
 basket_item2 = BasketItem(id="b2", item=dummy_item2, quantity=3)
 
 Orders = [
-    Order('1', OrderStatus.PENDING, DummyUserInfo, 149.99,
-          [basket_item1, basket_item2]),  
-    Order('2', OrderStatus.PENDING, DummyUserInfo, 1000.00,[basket_item1])
+
     ]
 
-Users = [
-    UserAccount('admin', 'admin', 
-                UserInfo('1', 'Admin', 'User', 'foobar@mail.com','1234567890')
-    )
-]
 
 def get_items():
     """Get all items."""
@@ -105,60 +96,80 @@ def mark_order_as_completed(order_id):
 
 
 def get_user_by_id(user_id):
-    """Find a UserAccount by user_id."""
-    for user in Users:
-        if user.info.id == str(user_id): 
-            return user
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT user_id, username, password_hash, email, first_name, last_name, phone
+        FROM users
+        WHERE user_id = %s
+    """, (user_id,))
+    row = cur.fetchone()
+    cur.close()
+    if row:
+        return UserAccount(
+            username=row['username'],
+            password=row['password_hash'],
+            email=row['email'],
+            info=UserInfo(
+                id=str(row['user_id']),
+                firstname=row['first_name'],
+                surname=row['last_name'],
+                email=row['email'],
+                phone=row['phone']
+            )
+        )
     return None
 
-def check_for_user(username):
-    """Check if the username and password are valid."""
-    cur = mysql.connection.cursor()
-    cur.execute('Select * FROM accountdetails WHERE username = %s',(username))
-    user = cur.fetchone()
-    cur.close
-        # never store passwords in plain text in production code
-        # this is just for demonstration purposes
-    if user:
-        return False
-    else:
-        return True
 
 def check_for_user(username, password):
-    """Check if the username and password are valid."""
-    for user in Users:
-        # never store passwords in plain text in production code
-        # this is just for demonstration purposes
-        if user.username == username and user.password == password:
-            return user
-    return None  # or raise an exception if preferred
-
-def regirster_new_user(new_user):
     cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT user_id, username, password_hash, email, first_name, last_name, phone
+        FROM users
+        WHERE username = %s AND password_hash = %s
+    """, (username, password))
+    row = cur.fetchone()
+    cur.close()
+    if row:
+        return UserAccount(row['username'], row['password_hash'], row['email'],
+                           UserInfo(str(row['user_id']), row['first_name'], row['last_name'],
+                                    row['email'],row['phone']))
+    return None
 
-    cur.execute("INSERT INTO users(first_name,last_name,username,password_hash,email)" \
-    " VALUES(%s,%s,%s,%s,%s)", 
-    (new_user.info.firstname,
-     new_user.info.surname,
-     new_user.username, 
-     new_user.password,
-     new_user.info.email,
-     #new_user.info.phone
-     ))
+def check_user_exists(username, email, phone):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT username, email, phone FROM users
+        WHERE username = %s OR email = %s OR phone = %s
+    """, (username, email, phone))
+    
+    exists = cur.fetchone() is not None 
+    cur.close()
+    return exists
+
+
+def add_user(form):
+    cur = mysql.connection.cursor()
+    check_admin = is_admin(form.username.data)
+    cur.execute(
+        "INSERT INTO users(first_name, last_name, username, password_hash, email, is_admin, phone) "
+        "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+        (
+            form.firstname.data,
+            form.surname.data,
+            form.username.data,
+            form.password.data,
+            form.email.data,
+            check_admin,
+            form.phone.data
+        )
+    )
     mysql.connection.commit()
     cur.close()
     return True
 
-def add_user(form):
-    """Add a new user."""
-    Users.append(
-        UserAccount(form.username.data, form.password.data, form.email.data,
-            UserInfo(f'U{len(Users)}', 
-                     form.firstname.data, form.surname.data , 
-                     form.email.data, form.phone.data
-                    )
-        )
-    )
+
+def is_admin(username):
+    return 'admin' in username.lower()
 
 def get_categories():
     cur = mysql.connection.cursor()
