@@ -22,6 +22,7 @@ def create_app():
     app.config['MYSQL_CURSORCLASS'] = os.getenv('MYSQL_CURSORCLASS', 'DictCursor')
 
     mysql.init_app(app)
+    
     Bootstrap5(app)
 
     from . import views

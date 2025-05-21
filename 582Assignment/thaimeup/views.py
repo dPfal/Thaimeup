@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
 from thaimeup import mysql
-from thaimeup.db import add_order, get_orders, check_for_user, check_user_exists, add_user, is_admin
+from thaimeup.db import  get_orders, check_for_user, check_user_exists, add_user, is_admin, insert_order,update_order_status_in_db
 from thaimeup.db import get_items, get_item, get_user_by_id, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_item,get_categories
-from thaimeup.session import get_basket, add_to_basket, empty_basket, convert_basket_to_order
+from thaimeup.session import get_basket, add_to_basket, empty_basket, get_user
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddItemForm,EditItemForm
-from thaimeup.models import UserAccount,UserInfo
+from thaimeup.models import UserAccount,UserInfo, BasketItem, Basket, Order, OrderStatus
 from hashlib import sha256
 
 bp = Blueprint('main', __name__)
@@ -121,38 +121,50 @@ def orders():
     orders = get_orders()
     return render_template('orders.html', orders = orders)
 
-@bp.route('/checkout/', methods=['POST', 'GET'])
+@bp.route('/checkout', methods=['GET', 'POST'])
 def checkout():
     if not session.get('logged_in'):
-        flash('Please log in to proceed to checkout.', 'error')
-        return redirect(url_for('main.order'))
+        flash("Please log in.")
+        return redirect(url_for('main.login'))
 
     form = CheckoutForm()
-    order = get_basket()
-    totalprice = order.total_cost()
 
-    if request.method == 'GET':
-        user = session.get('user')
-        if user:
-            form.firstname.data = user.get('firstname', '')
-            form.surname.data = user.get('surname', '')
-            form.phone.data = user.get('phone', '')
+    if request.method == 'POST' and form.validate_on_submit():
+        return place_order(form) 
     
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            order.status = True
-            order.firstname = form.firstname.data
-            order.surname = form.surname.data
-            order.phone = form.phone.data
-            order.address = form.address.data
-            flash('Thank you for your information, your order is being processed!')
-            order = convert_basket_to_order(order)
-            empty_basket()
-            add_order(order)
-            return redirect(url_for('main.index'))
-        else:
-            flash('The provided information is missing or incorrect. Please complete the fields correctly to process your order.', 'error')
-    return render_template('checkout.html', form=form, order=order, totalprice=totalprice)
+    if request.method == 'GET':
+        user = get_user()
+        form.firstname.data = user.get('firstname', '')
+        form.surname.data = user.get('surname', '')
+        form.phone.data = user.get('phone', '')
+
+    basket = get_basket()
+    return render_template("checkout.html", form=form, basket=basket, show_errors=(request.method == 'POST'))
+
+@bp.route('/placeorder', methods=['GET', 'POST'])
+def place_order(form):
+    basket = get_basket()
+    user = get_user()
+
+    if not basket.items:
+        flash("Your basket is empty.", "error")
+        return redirect(url_for('main.order'))
+
+    order = Order(
+        id=None,
+        status=OrderStatus.PENDING,
+        user=user,
+        items=basket.items
+    )
+
+    order_id = insert_order(order, form)
+
+    empty_basket()
+
+    flash(f"Thank you, {user['firstname']}! Your order #{order_id} has been placed.")
+    return redirect(url_for('main.index'))
+
+
 
 
 @bp.route('/login/', methods=['POST', 'GET'])
@@ -167,7 +179,6 @@ def login():
                 flash('Invalid username or password', 'error')
                 return redirect(url_for('main.login'))
 
-            # Store full user info in session
             session['user'] = {
                 'user_id': user.info.id,
                 'firstname': user.info.firstname,
@@ -281,3 +292,19 @@ def mark_available(item_id):
     mark_item_as_available(item_id)
     flash('Item is now available for sale.')
     return redirect(url_for('main.edit_menu', item_id=item_id))
+
+@bp.route('/admin/update_order_status/<int:order_id>', methods=['POST'])
+def update_order_status(order_id):
+    if not session.get('logged_in') or not session.get('is_admin'):
+        flash('Unauthorized access.', 'error')
+        return redirect(url_for('main.index'))
+
+    new_status = request.form.get('new_status')
+    if new_status not in ['pending', 'completed', 'cancelled']:
+        flash('Invalid status.', 'error')
+        return redirect(url_for('main.orders'))
+
+    update_order_status_in_db(order_id, new_status)
+
+    flash(f"Order #{order_id} status updated to {new_status.capitalize()}.")
+    return redirect(url_for('main.orders'))

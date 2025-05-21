@@ -13,18 +13,6 @@ class Item:
     is_available: bool
     image: str = 'foobar.png'
    
-
-
-class OrderStatus(Enum):
-    PENDING = 'pending'
-    COMPLETED = 'completed'
-    #status: bool
-
-    def is_pending(self):
-        return self == OrderStatus.PENDING
-    
-    def is_completed(self):
-        return self == OrderStatus.COMPLETED
     
 @dataclass
 class UserInfo:
@@ -87,18 +75,36 @@ class Basket:
         """Calculate the total cost of the basket."""
         return sum(item.total_price() for item in self.items)
 
+class OrderStatus(Enum):
+    PENDING = 'PENDING'
+    COMPLETED = 'COMPLETED'
+    CANCELLED = 'CANCELLED'
+    #status: bool
+
+    def is_pending(self):
+        return self == OrderStatus.PENDING
+    
+    def is_completed(self):
+        return self == OrderStatus.COMPLETED
 
 @dataclass
 class Order:
     id: str
-    status: OrderStatus
-    user: UserInfo
-    total_cost: float = 0.0
-    items: List[BasketItem] = field(
-        default_factory=list,
-        init=True)
-    date: datetime = field(
-        default_factory=lambda: datetime.now(),
-        init=True)
-    
+    status: 'OrderStatus'
+    user: 'UserInfo'
+    items: List['BasketItem'] = field(default_factory=list)
+    date: datetime = field(default_factory=datetime.now)
+
+    delivery_method: str = 'Standard'      # ex) 'Standard', 'Express', 'Eco'
+    payment_method: str = 'Credit Card'    # ex) 'Credit Card', 'PayPal', 'Apple Pay'
+    recipient_phone: str = ''
+    recipient_address: str = ''
+    recipient_first_name: str = ''
+    recipient_last_name: str = ''
+    delivery_fee: float = 0.0
+
+    def calculate_total_cost(self) -> float:
+        return sum(item.total_price() for item in self.items) + self.delivery_fee
+
+
 

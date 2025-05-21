@@ -13,8 +13,7 @@
         background-color: #FF8C3F;
         color: #fff;
         border: 0px;
-        width: 100%;
-        height: 50px;
+
         font-size: 16px;
     }
 
@@ -23,8 +22,6 @@
         background-color: #FF8C3F;
         color: #fff;
         border: 0px;
-        width: 100%;
-        height: 50px;
         font-size: 16px;
     }
 
@@ -93,8 +90,8 @@
     {% endif %}
 </div>
 {% if session.get('is_admin') %}
-<div class="d-flex justify-content-center mb-4">
-    <a href="{{ url_for('main.add_item') }}" class="btn button px-4" style="width: auto;">+ Add New Item</a>
+<div class="d-flex justify-content-center text-center">
+    <a href="{{ url_for('main.add_item') }}" class="btn button px-4">+ Add New Item</a>
 </div>
 {% endif %}
 <section class="shadow-sm p-5" id="items">

@@ -5,35 +5,6 @@ from datetime import datetime
 from flask import Flask
 from . import mysql
 
-DummyUserInfo = []
-
-dummy_item1 = Item(
-    id="1",
-    name="Burger",
-    description="Juicy grilled beef burger",
-    category="Food",
-    price=9.99,
-    is_available=True,
-    image="padthai.jpeg"
-)
-
-dummy_item2 = Item(
-    id="2",
-    name="Fries",
-    description="Crispy golden fries",
-    category="Side",
-    price=4.99,
-    is_available=True,
-    image="somtum.jpeg"
-)
-
-basket_item1 = BasketItem(id="b1", item=dummy_item1, quantity=2)
-basket_item2 = BasketItem(id="b2", item=dummy_item2, quantity=3)
-
-Orders = [
-
-    ]
-
 
 def get_items():
     """Get all items."""
@@ -65,21 +36,163 @@ def get_item(item_id):
     return Item(str(row['item_id']), row['name'], row['description'], row['category_name'],
                  row['price'], bool(row['is_available']), row['image']) if row else None
 
-def add_order(order):
-    """Add a new order."""
-    Orders.append(order)
+def insert_order_with_items(order, form):
+    conn = mysql.connection
+    cur = conn.cursor()
+
+    sql = """
+    INSERT INTO orders (
+        user_id, order_date_time, delivery_id,
+        recipient_phone, recipient_address,
+        recipient_first_name, recipient_last_name,
+        payment_method, total_cost, status
+    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    values = (
+        order.user['user_id'],
+        datetime.now(),
+        form.delivery_method.data,
+        form.phone.data,
+        form.address.data,
+        form.firstname.data,
+        form.surname.data,
+        form.payment_method.data,
+        order.total_cost,
+        'PENDING'
+    )
+
+    cur.execute(sql, values)
+    order_id = cur.lastrowid
+
+    for item in order.items:
+        cur.execute("""
+            INSERT INTO order_items (order_id, item_id, quantity, price)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            order_id,
+            item.item.id,
+            item.quantity,
+            item.item.price
+        ))
+
+    conn.commit()
+    cur.close()
+    return order_id
+
 
 def get_orders():
-    """Get all orders."""
-    return Orders
+    cur = mysql.connection.cursor()
+    cur.execute("""
+    SELECT o.*, u.first_name, u.last_name, u.phone, d.delivery_name, d.cost
+    FROM orders o
+    JOIN users u ON o.user_id = u.user_id
+    JOIN delivery_options d ON o.delivery_id = d.delivery_id
+    ORDER BY o.status desc, o.order_date_time DESC
+""")
+    order_rows = cur.fetchall()
+
+    orders = []
+    for row in order_rows:
+        user_info = UserInfo(
+            id=row['user_id'],
+            firstname=row['first_name'],
+            surname=row['last_name'],
+            email='',  
+            phone=row['phone']
+        )
+
+        cur.execute("""
+            SELECT oi.*, i.name, i.description, i.price, i.image, c.category_name
+            FROM order_items oi
+            JOIN items i ON oi.item_id = i.item_id
+            JOIN categories c ON i.category_id = c.category_id
+            WHERE oi.order_id = %s
+        """, (row['order_id'],))
+        item_rows = cur.fetchall()
+
+        basket_items = []
+        for item in item_rows:
+            item_obj = Item(
+                id=str(item['item_id']),
+                name=item['name'],
+                description=item['description'],
+                category=item['category_name'],
+                price=float(item['price']),
+                is_available=True,
+                image=item['image']
+            )
+            basket_items.append(BasketItem(
+                id=str(item['order_item_id']),
+                item=item_obj,
+                quantity=item['quantity']
+            ))
+
+        order = Order(
+            id=str(row['order_id']),
+            status=OrderStatus(row['status'].upper()), 
+            user=user_info,
+            items=basket_items,
+            date=row['order_date_time'],    
+            delivery_method=row['delivery_name'],
+            delivery_fee=float(row['cost']),
+            payment_method=row['payment_method'],
+            recipient_phone=row['recipient_phone'],
+            recipient_address=row['recipient_address'],
+            recipient_first_name=row['recipient_first_name'],
+            recipient_last_name=row['recipient_last_name']
+        )
+        orders.append(order)
+
+    cur.close()
+    return orders
+
+
 
 def get_order(order_id):
-    """Get an order by its ID."""
-    order_id = str(order_id)
-    for order in Orders:
-        if order.id == order_id:
-            return order
-    return None  # or raise an exception if preferred
+    conn = mysql.connection
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM orders WHERE order_id = %s", (order_id,))
+    order = cur.fetchone()
+
+    cur.close()
+    return order
+
+def insert_order(order, form):
+    conn = mysql.connection
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        INSERT INTO orders (
+            user_id, order_date_time, delivery_id,
+            recipient_phone, recipient_address,
+            recipient_first_name, recipient_last_name,
+            payment_method, status
+        ) VALUES (%s, NOW(), %s, %s, %s, %s, %s, %s, %s)
+    """, (
+        order.user['user_id'],
+        form.delivery_method.data,
+        form.phone.data,
+        form.address.data,
+        form.firstname.data,
+        form.surname.data,
+        form.payment_method.data, 
+        'PENDING'
+    ))
+    order_id = cur.lastrowid
+
+    for item in order.items:
+        cur.execute("""
+            INSERT INTO order_items (order_id, item_id, quantity)
+            VALUES (%s, %s, %s)
+        """, (
+            order_id,
+            item.item.id,
+            item.quantity
+        ))
+
+    conn.commit()
+    cur.close()
+    return order_id
 
 def mark_order_as_pending(order_id):
     cur = mysql.connection.cursor()
@@ -221,4 +334,15 @@ def mark_item_as_unavailable(item_id):
     cur = mysql.connection.cursor()
     cur.execute("UPDATE items SET is_available = 0 WHERE item_id = %s", (item_id,))
     mysql.connection.commit()
+    cur.close()    
+
+def update_order_status_in_db(order_id: int, new_status: str):
+    """Update the status of a specific order in the database."""
+    conn = mysql.connection
+    cur = conn.cursor()
+    new_status = new_status.upper() 
+    print(f"[DB] Updating order {order_id} status to {new_status}...")
+    cur.execute("UPDATE orders SET status = %s WHERE order_id = %s", (new_status, order_id))
+    print(f"[DB] Rows affected: {cur.rowcount}") 
+    conn.commit()
     cur.close()    

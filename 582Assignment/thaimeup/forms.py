@@ -1,13 +1,27 @@
 from flask_wtf import FlaskForm
-from wtforms.fields import SubmitField, StringField, PasswordField,SelectField,DecimalField,TextAreaField
+from wtforms.fields import SubmitField, StringField, PasswordField,SelectField,DecimalField,TextAreaField, RadioField
 from wtforms.validators import InputRequired, email, NumberRange
 
 class CheckoutForm(FlaskForm):
     """Form for user checkout."""
-    firstname = StringField("First name", validators = [InputRequired()])
-    surname = StringField("Lastname", validators = [InputRequired()])
-    phone = StringField("Phone Number", validators = [InputRequired()])
-    address = StringField("Address", validators = [InputRequired()])
+    firstname = StringField("First name", validators=[InputRequired()])
+    surname = StringField("Last name", validators=[InputRequired()])
+    phone = StringField("Phone Number", validators=[InputRequired()])
+    address = StringField("Address", validators=[InputRequired()])
+
+    delivery_method = RadioField("Delivery Method", choices=[
+        ('1', 'Standard Delivery (+$5.00)'),
+        ('2', 'Express Delivery (+$10.00)'),
+        ('3', 'Eco Delivery (+$3.00)')
+    ], default='1', validators=[InputRequired()])
+
+    payment_method = RadioField("Payment Method", choices=[
+        ('PayPal'),
+        ('Apple Pay'),
+        ('Credit/Debit Card')
+    ], default='PayPal', validators=[InputRequired()])
+    submit = SubmitField("Place Order")
+
 
 class LoginForm(FlaskForm):
     """Form for user login."""
