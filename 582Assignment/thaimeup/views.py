@@ -7,6 +7,7 @@ from thaimeup.session import get_basket, add_to_basket, empty_basket, get_user
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddItemForm,EditItemForm
 from thaimeup.models import UserAccount,UserInfo, BasketItem, Basket, Order, OrderStatus
 from hashlib import sha256
+from thaimeup.wrappers import only_admins
 
 bp = Blueprint('main', __name__)
 
@@ -117,6 +118,7 @@ def update_basket_quantity(item_id, action):
     return redirect(url_for('main.order'))
 
 @bp.route('/admin/orders/')
+@only_admins
 def orders():
     orders = get_orders()
     return render_template('orders.html', orders = orders)
@@ -221,6 +223,7 @@ def register():
     return render_template('register.html', form=form)
 
 @bp.route('/admin/add/', methods=['GET', 'POST'])
+@only_admins
 def add_item():
     form = AddItemForm()
     form.category.choices = get_categories()
@@ -239,6 +242,7 @@ def add_item():
     return render_template('add_item_admin.html', form=form)
 
 @bp.route('/admin/edit/<int:item_id>/', methods=['GET', 'POST'])
+@only_admins
 def edit_menu(item_id):
     item = get_item(item_id)
     if not item:
@@ -276,24 +280,28 @@ def edit_menu(item_id):
     return render_template("edit_item_admin.html", form=form, item=item)
 
 @bp.route('/admin/delete/<int:item_id>/', methods=['POST'])
+@only_admins
 def delete_menu(item_id):
     delete_item(item_id)
     flash('Item deleted.')
     return redirect(url_for('main.index'))
 
 @bp.route('/admin/unavailable/<int:item_id>/', methods=['POST'])
+@only_admins
 def mark_unavailable(item_id):
     mark_item_as_unavailable(item_id)
     flash('Item marked as sold out.')
     return redirect(url_for('main.edit_menu', item_id=item_id))
 
 @bp.route('/admin/available/<int:item_id>/', methods=['POST'])
+@only_admins
 def mark_available(item_id):
     mark_item_as_available(item_id)
     flash('Item is now available for sale.')
     return redirect(url_for('main.edit_menu', item_id=item_id))
 
 @bp.route('/admin/update_order_status/<int:order_id>', methods=['POST'])
+@only_admins
 def update_order_status(order_id):
     if not session.get('logged_in') or not session.get('is_admin'):
         flash('Unauthorized access.', 'error')
