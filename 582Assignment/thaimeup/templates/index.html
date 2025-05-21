@@ -67,7 +67,9 @@
 </style>
 
 <div class="text-center mb-4">
+    {% if not search %}
     <form method="GET" action="{{ url_for('main.index') }}">
+        <input type="hidden" name="search" value="{{ search }}">
         <div class="row justify-content-center">
             {% for cat in ['all', 'Rice', 'Noodle', 'Entree', 'Salad', 'Curry'] %}
             <div class="col-md-2 mb-2">
@@ -82,6 +84,13 @@
             {% endfor %}
         </div>
     </form>
+    {% endif %} 
+
+    {% if search %}
+    <div class="text-center my-3">
+        <h4>Results for “{{ search }}”</h4>
+    </div>
+    {% endif %}
 </div>
 {% if session.get('is_admin') %}
 <div class="d-flex justify-content-center mb-4">

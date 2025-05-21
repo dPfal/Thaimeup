@@ -11,16 +11,30 @@ from hashlib import sha256
 bp = Blueprint('main', __name__)
 
 
-@bp.route('/')
+@bp.route('/', methods=['GET'])
 def index():
     category = request.args.get('category', 'all')
-    
+    search   = request.args.get('search', '').strip()
+
     items = get_items()
-    
+
     if category != 'all':
         items = [item for item in items if item.category.lower() == category.lower()]
-    
-    return render_template('index.html', items=items, category=category)
+
+    if search:
+        items = [
+            item for item in items
+            if search.lower() in item.name.lower()
+               or search.lower() in item.description.lower()
+               or search.lower() in item.category]
+
+    return render_template(
+        'index.html',
+        items=items,
+        category=category,
+        search=search
+    )
+
 
 
 @bp.route('/itemdetails/<int:itemid>/')

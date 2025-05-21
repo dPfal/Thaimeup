@@ -71,7 +71,11 @@
                     </li>
                     {% if session.get('is_admin') %}
                     <li class="nav-item">
+<<<<<<< HEAD
                         <a class="nav-link text-light" href="{{ url_for('main.orders') }}">Orders</a>
+=======
+                        <a class="nav-link text-light" href="{{ url_for('main.add_item') }}">Orders</a>
+>>>>>>> b42ec8c (search)
                     </li>
                     {% endif %}
                 </ul>
@@ -79,9 +83,15 @@
                 <ul class="navbar-nav ms-auto">
 
                     <li class="nav-item">
-                        <form class="d-flex ms-5">
-                            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-                            <button class="btn nav-btn btn-dark ms-2" type="submit">Search</button>
+                        <form class="d-flex ms-5" method="GET" action="{{ url_for('main.index') }}">
+                            <!-- 把当前分类也带上，防止搜完又变回 all -->
+                            <input type="hidden" name="category" value="{{ request.args.get('category','all') }}">
+
+                            <!-- 真正的搜索框：一定要 name="search" -->
+                            <input class="form-control me-2" type="search" name="search" placeholder="Search"
+                                aria-label="Search" value="{{ request.args.get('search','') }}">
+
+                            <button class="btn nav-btn btn-dark" type="submit">Search</button>
                         </form>
                     </li>
                     {% if not session.get('logged_in') %}
