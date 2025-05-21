@@ -81,7 +81,7 @@
             {% endfor %}
         </div>
     </form>
-    {% endif %} 
+    {% endif %}
 
     {% if search %}
     <div class="text-center my-3">
@@ -89,7 +89,7 @@
     </div>
     {% endif %}
 </div>
-{% if session.get('is_admin') %}
+{% if session.get('is_admin') and not search %}
 <div class="d-flex justify-content-center text-center">
     <a href="{{ url_for('main.add_item') }}" class="btn button px-4">+ Add New Item</a>
 </div>
