@@ -106,6 +106,7 @@
                         <h4 class="card-text mt-auto text-end">A${{ item.price }}</h4>
                     </div>
                 </a>
+                {% if not session.get('is_admin') %}
                 {% if item.is_available %}
                 <div class="card-footer bg-white border-top-0">
                     <form method="POST" action="{{ url_for('main.adding_to_basket', item_id=item.id) }}">
@@ -116,6 +117,7 @@
                 <div class="card-footer bg-white border-top-0">
                     <button type="button" class="btn btn-secondary w-100" disabled>Sold Out</button>
                 </div>
+                {% endif %}
                 {% endif %}
                 {% if session.get('is_admin') %}
                 <div class="card-footer bg-white border-top-0">
