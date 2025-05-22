@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
 from thaimeup import mysql
-from thaimeup.db import  get_orders, check_for_user, check_user_exists, add_user, is_admin, insert_order,update_order_status_in_db
-from thaimeup.db import get_items, get_item, get_user_by_id, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_item,get_categories
+from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db
+from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_item,get_categories
 from thaimeup.session import get_basket, add_to_basket, empty_basket, get_user
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddItemForm,EditItemForm
 from thaimeup.models import UserAccount,UserInfo, BasketItem, Basket, Order, OrderStatus
@@ -231,11 +231,6 @@ def register():
         if form.validate_on_submit():
             form.password.data = sha256(form.password.data.encode()).hexdigest()
             # Check if the user already exists
-            user = check_user_exists(form.username.data, form.email.data, form.phone.data)
-            if user:
-                flash('User already exists', 'error')
-                return redirect(url_for('main.register'))
-
             add_user(form)
             flash('Registration successful!')
             return redirect(url_for('main.login'))

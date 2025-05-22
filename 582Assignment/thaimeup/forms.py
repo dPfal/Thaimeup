@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms.fields import SubmitField, StringField, PasswordField,SelectField,DecimalField,TextAreaField, RadioField
 from wtforms.validators import InputRequired, email, NumberRange,EqualTo
-from thaimeup.db import is_username_taken
+from thaimeup.db import is_username_taken,is_phone_taken,is_email_taken
 from wtforms import ValidationError
+
 class CheckoutForm(FlaskForm):
     """Form for user checkout."""
     firstname = StringField("First name", validators=[InputRequired()])
@@ -36,7 +37,7 @@ from wtforms.validators import InputRequired, Length, Email, Regexp
 
 class RegisterForm(FlaskForm):
     """Form for user registration."""
-    
+
     username = StringField(
         "Username",
         validators=[
@@ -47,14 +48,6 @@ class RegisterForm(FlaskForm):
     def validate_username(self, field):
         if is_username_taken(field.data):
             raise ValidationError("This username is already taken.")    
-    password = PasswordField("Password", validators=[
-        InputRequired(), Length(min=6),
-        EqualTo('confirm_password', message="Passwords must match.")
-    ])
-
-    confirm_password = PasswordField("Confirm Password", validators=[
-        InputRequired()
-    ])
 
     email = StringField(
         "Email",
@@ -63,6 +56,29 @@ class RegisterForm(FlaskForm):
             Email(message="Please enter a valid email address.")
         ]
     )
+    def validate_email(self, field):
+        if is_email_taken(field.data):
+            raise ValidationError("This email is already registered.")
+
+    phone = StringField(
+        "Phone Number",
+        validators=[
+            InputRequired(),
+            Regexp(r'^\d{9,15}$', message="Enter a valid phone number (9–15 digits).")
+        ]
+    )
+    def validate_phone(self, field):
+        if is_phone_taken(field.data):
+            raise ValidationError("This phone number is already registered.")
+
+    password = PasswordField("Password", validators=[
+        InputRequired(), Length(min=6),
+        EqualTo('confirm_password', message="Passwords must match.")
+    ])
+
+    confirm_password = PasswordField("Confirm Password", validators=[
+        InputRequired()
+    ])
 
     firstname = StringField(
         "First Name",
@@ -80,15 +96,8 @@ class RegisterForm(FlaskForm):
         ]
     )
 
-    phone = StringField(
-        "Phone Number",
-        validators=[
-            InputRequired(),
-            Regexp(r'^\d{9,15}$', message="Enter a valid phone number (9–15 digits).")
-        ]
-    )
-
     submit = SubmitField("Create Account")
+
 
 
 class AddItemForm(FlaskForm):

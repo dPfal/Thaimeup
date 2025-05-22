@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
 
 {% block head %}
+{% if not session.get('is_admin') %}
 <div class="d-flex justify-content-center">
     <img src="{{ url_for('static', filename='img/1.png') }}" class="img-fluid" alt="Responsive image">
 </div>
+{% endif %}
+
 {% endblock %}
 
 {% block main %}
@@ -62,7 +65,15 @@
         border-top: none;
     }
 </style>
-
+{% if session.get('is_admin') and not search %}
+<div class="alert alert-light border shadow-sm mb-4 text-center">
+    <h5 class="mb-3">Admin Panel</h5>
+    <p class="mb-3 text-muted">You are logged in as an administrator.</p>
+    <a href="{{ url_for('main.add_item') }}" class="btn button px-4 py-2 ">
+        + Add New Menu Item
+    </a>
+</div>
+{% endif %}
 <div class="text-center mb-4">
     {% if not search %}
     <form method="GET" action="{{ url_for('main.index') }}">
@@ -89,11 +100,7 @@
     </div>
     {% endif %}
 </div>
-{% if session.get('is_admin') and not search %}
-<div class="d-flex justify-content-center text-center">
-    <a href="{{ url_for('main.add_item') }}" class="btn button px-4">+ Add New Item</a>
-</div>
-{% endif %}
+
 <section class="shadow-sm p-5" id="items">
     <div class="row ps-2 pe-2">
         {% if items %}
@@ -116,7 +123,7 @@
                 {% if item.is_available %}
                 <div class="card-footer bg-white border-top-0">
                     <form method="POST" action="{{ url_for('main.adding_to_basket', item_id=item.id) }}">
-                        <button type="submit" class="btn button w-100">Add to Cart</button>
+                        <button type="submit" class="btn button w-100 ">Add to Cart</button>
                     </form>
                 </div>
                 {% else %}
@@ -128,7 +135,7 @@
                 {% if session.get('is_admin') %}
                 <div class="card-footer bg-white border-top-0">
                     <a href="{{ url_for('main.edit_menu', item_id=item.id) }}">
-                        <button class="btn button w-100">Edit Menu</button>
+                        <button class="btn button w-100 py-2">Edit Menu</button>
                     </a>
                 </div>
                 {% endif %}

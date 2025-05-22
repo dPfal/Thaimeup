@@ -248,16 +248,6 @@ def check_for_user(username, password):
                                     row['email'],row['phone']))
     return None
 
-def check_user_exists(username, email, phone):
-    cur = mysql.connection.cursor()
-    cur.execute("""
-        SELECT username, email, phone FROM users
-        WHERE username = %s OR email = %s OR phone = %s
-    """, (username, email, phone))
-    
-    exists = cur.fetchone() is not None 
-    cur.close()
-    return exists
 
 
 def add_user(form):
@@ -351,4 +341,16 @@ def is_username_taken(username):
     conn = mysql.connection
     with conn.cursor() as cursor:
         cursor.execute("SELECT 1 FROM users WHERE username = %s", (username,))
+        return cursor.fetchone() is not None
+    
+def is_email_taken(email):
+    conn = mysql.connection
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT 1 FROM users WHERE email = %s", (email,))
+        return cursor.fetchone() is not None
+
+def is_phone_taken(phone):
+    conn = mysql.connection
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT 1 FROM users WHERE phone = %s", (phone,))
         return cursor.fetchone() is not None

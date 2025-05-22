@@ -1,47 +1,51 @@
 {% extends 'base.html' %}
 {% block main %}
-<section class="py-5">
+<section class="py-2">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
-
+            <div class="col-lg-10 col-xl-8">
                 <div class="card shadow-sm rounded-4">
                     <div class="card-body p-5">
 
-                        <h1 class="text-center mb-4">User Login</h1>
+                        <h1 class="text-center fs-3 mb-3">User Login</h1>
 
-                        <p class="text-center text-muted">
-                            Welcome back to <strong>Thai Me Up</strong>!
-                            Please log in to continue. <br>
+                        <p class="text-center text-muted mb-4 fs-6">
+                            Welcome back to <strong>Thai Me Up</strong>!<br>
                             Don't have an account?
                             <a href="{{ url_for('main.register') }}"
                                 class="text-decoration-none text-primary fw-semibold">
-                                Register here
-                            </a>.
+                                Register here.
+                            </a>
                         </p>
-
 
                         <form method="POST">
                             {{ form.hidden_tag() }}
 
                             <div class="mb-3">
                                 {{ form.username.label(class="form-label fw-bold") }}
-                                {{ form.username(class="form-control form-control-lg") }}
+                                {{ form.username(class="form-control",
+                                placeholder="Enter your username") }}
+                                {% for error in form.username.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
                             </div>
 
                             <div class="mb-4">
                                 {{ form.password.label(class="form-label fw-bold") }}
-                                {{ form.password(class="form-control form-control-lg") }}
+                                {{ form.password(class="form-control",
+                                placeholder="Enter your password") }}
+                                {% for error in form.password.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
                             </div>
 
                             <div class="d-grid">
-                                {{ form.submit(class="btn btn-lg fw-bold text-white mainColor") }}
+                                {{ form.submit(class="btn btn-lg text-white mainColor fw-bold", value="Log in") }}
                             </div>
                         </form>
 
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
