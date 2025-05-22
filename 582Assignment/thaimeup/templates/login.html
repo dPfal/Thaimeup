@@ -1,81 +1,47 @@
 {% extends 'base.html' %}
-
 {% block main %}
-<style>
-    .register-link {
-        text-decoration: none;
-        color: orange;
-    }
-    .h1 {
-        font-size: 50px;
-        text-align: center;
-    }
-    .register-intr{
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-    }
-    .form-label{
-        font-size: 22px;
-        font-weight: bold;
-    }
-    .form-control {
-        font-size: 20px;
-    }
-    .btn.button {
-        background-color: orange;
-        color: #000;
-        margin-top: 2rem;
-        margin-bottom: 3rem;
-        
-    }
-    .btn-container {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-    }
-    .card-container {
-        border-radius: 15px;
-        padding-top: 2rem;
-        box-shadow: #000 5px 5px 5px;
-    }
-</style>
-<section class="shadow-sm mb-5 mt-5">  
-    <div class="container card-container">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="h1">User Login</h1>
-                <p class="register-intr">
-                    Thank you for returning to Thai Me Up. Please provide
-                    your login details to access your account. 
-                    If you do not have an account,  
-                    <a href="{{ url_for('main.register') }}" class="register-link">
-                         register first
-                    </a>    
-                    .
-                </p>
-            </div>
-        </div>
-        <div class="row mt-4 justify-content-center p-3">
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
             <div class="col-md-6">
-                <form method="POST">
-                    {{ form.hidden_tag() }}
 
-                    <div class="mb-3">
-                        {{ form.username.label(class="form-label") }}
-                        {{ form.username(class="form-control") }}
-                    </div>
+                <div class="card shadow-sm rounded-4">
+                    <div class="card-body p-5">
 
-                    <div class="mb-3">
-                        {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control") }}
+                        <h1 class="text-center mb-4">User Login</h1>
+
+                        <p class="text-center text-muted">
+                            Welcome back to <strong>Thai Me Up</strong>!
+                            Please log in to continue. <br>
+                            Don't have an account?
+                            <a href="{{ url_for('main.register') }}"
+                                class="text-decoration-none text-primary fw-semibold">
+                                Register here
+                            </a>.
+                        </p>
+
+
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+
+                            <div class="mb-3">
+                                {{ form.username.label(class="form-label fw-bold") }}
+                                {{ form.username(class="form-control form-control-lg") }}
+                            </div>
+
+                            <div class="mb-4">
+                                {{ form.password.label(class="form-label fw-bold") }}
+                                {{ form.password(class="form-control form-control-lg") }}
+                            </div>
+
+                            <div class="d-grid">
+                                {{ form.submit(class="btn btn-lg fw-bold text-white mainColor") }}
+                            </div>
+                        </form>
+
                     </div>
-                    <div class="btn-container">
-                    {{ form.submit(class="btn button") }}
-                    </div>
-                </form>
+                </div>
+
             </div>
         </div>
     </div>

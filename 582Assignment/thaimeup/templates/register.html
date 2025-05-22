@@ -1,118 +1,97 @@
 {% extends 'base.html' %}
-
 {% block main %}
-<style>
-    .register-link {
-        text-decoration: none;
-        color: orange;
-    }
-    .h1 {
-        font-size: 50px;
-        text-align: center;
-    }
-    .register-intr{
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-    }
-    .form-label{
-        font-size: 22px;
-        font-weight: bold;
-    }
-    .form-control {
-        font-size: 20px;
-    }
-    .btn.button {
-        background-color: orange;
-        color: #000;
-        margin-top: 2rem;
-        margin-bottom: 3rem;
-        
-    }
-    .d-grid.btn-container {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-    }
-    .card-container {
-        border-radius: 15px;
-        padding-top: 2rem;
-        box-shadow: #000 5px 5px 5px;
-    }
-</style>
-<section class="shadow-sm mb-5 mt-5">  
-    <div class="container card-container">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="h1">User Registry</h1>
-                <p class="register-intr">
-                    Thank you for interested in Thai Me Up. Please provide
-                    your details to create your account. 
-                    If you already have an account 
-                    ,  </br> <a href="{{ url_for('main.login') }}" class="register-link">login here</a>.
-                </p>
-            </div>
-        </div>
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
 
-        <div class="row mt-4 justify-content-center p-3">
-            <div class="col-md-6">
-                <form method="POST" action="">
-                    {{ form.hidden_tag() }}
+                <div class="card shadow-sm rounded-4">
+                    <div class="card-body p-5">
 
-                    <div class="mb-3">
-                        {{ form.username.label(class="form-label") }}
-                        {{ form.username(class="form-control") }}
-                        {% for error in form.username.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
+                        <h1 class="text-center mb-4">Create Your Account</h1>
+
+                        <p class="text-center text-muted">
+                            Already a member?
+                            <a href="{{ url_for('main.login') }}" class="text-decoration-none text-primary fw-semibold">
+                                Sign in here
+                            </a>.
+                        </p>
+
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+
+
+
+                            <div class="mb-3">
+                                {{ form.firstname.label(class="form-label fw-bold") }}
+                                {{ form.firstname(class="form-control form-control-lg", placeholder="John") }}
+                                {% for error in form.firstname.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form.surname.label(class="form-label fw-bold") }}
+                                {{ form.surname(class="form-control form-control-lg", placeholder="Smith") }}
+                                {% for error in form.surname.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.email.label(class="form-label fw-bold") }}
+                                {{ form.email(class="form-control form-control-lg",
+                                placeholder="thaimeup@example.com")}}
+                                {% for error in form.email.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.phone.label(class="form-label fw-bold") }}
+                                {{ form.phone(class="form-control form-control-lg", placeholder="0412345678") }}
+                                {% for error in form.phone.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <br>
+                            <div class="mb-3">
+                                {{ form.username.label(class="form-label fw-bold") }}
+                                {{ form.username(class="form-control form-control-lg",
+                                placeholder="Create a unique username") }}
+
+                                {% for error in form.username.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Password -->
+                            <div class="mb-3">
+                                {{ form.password.label(class="form-label fw-bold") }}
+                                {{ form.password(class="form-control form-control-lg",
+                                placeholder="Create a password")}}
+                                {% for error in form.password.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-4">
+                                {{ form.confirm_password.label(class="form-label fw-bold") }}
+                                {{ form.confirm_password(class="form-control form-control-lg",
+                                placeholder="Repeat your password") }}
+                                {% for error in form.confirm_password.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <br>
+                            <div class="d-grid">
+                                {{ form.submit(class="btn btn-lg text-white mainColor fw-bold",
+                                value="Sign up") }}
+                            </div>
+
+                        </form>
+
                     </div>
+                </div>
 
-                    <div class="mb-3">
-                        {{ form.email.label(class="form-label") }}
-                        {{ form.email(class="form-control") }}
-                        {% for error in form.email.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control") }}
-                        {% for error in form.password.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.firstname.label(class="form-label") }}
-                        {{ form.firstname(class="form-control") }}
-                        {% for error in form.firstname.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.surname.label(class="form-label") }}
-                        {{ form.surname(class="form-control") }}
-                        {% for error in form.surname.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form.phone.label(class="form-label") }}
-                        {{ form.phone(class="form-control") }}
-                        {% for error in form.phone.errors %}
-                            <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="d-grid btn-container">
-                        {{ form.submit(class="btn button") }}
-                    </div>
-                </form>
             </div>
         </div>
     </div>

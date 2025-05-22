@@ -1,6 +1,19 @@
 {% extends 'base.html' %}
 {% import 'bootstrap5/form.html' as wtf %}
 {% block main %}
+
+<style>
+  .price-display {
+    display: none;
+  }
+
+  #delivery_method-0:checked~.price-box #price-standard,
+  #delivery_method-1:checked~.price-box #price-express,
+  #delivery_method-2:checked~.price-box #price-eco {
+    display: block;
+  }
+</style>
+
 <section class="shadow-sm mb-5 mt-5">
   <div class="container">
     <div class="row">
@@ -8,6 +21,7 @@
         <h1>Checkout</h1>
         <form method="POST" action="{{ url_for('main.checkout') }}">
           {{ form.hidden_tag() }}
+
           <div class="row">
             <div class="col card m-3 p-3">
               <h4>Order Summary</h4>
@@ -26,33 +40,11 @@
               </div>
               {% endfor %}
               <div class="mt-4">
-                <h2>Total: ${{ "%.2f"|format(basket.total_cost()) }}</h2>
+                <h2>Total (Items): ${{ "%.2f"|format(basket.total_cost()) }}</h2>
               </div>
               {% else %}
               <p>Your basket is empty.</p>
               {% endif %}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col card m-3 p-3">
-              <h4>Delivery & Payment</h4>
-              <hr>
-
-              <h5 class="mb-2">{{ form.delivery_method.label }}</h5>
-              {% for subfield in form.delivery_method %}
-              <div class="form-check">
-                {{ subfield(class="form-check-input") }}
-                {{ subfield.label(class="form-check-label") }}
-              </div>
-              {% endfor %}
-
-              <h5 class="mt-4 mb-2">{{ form.payment_method.label }}</h5>
-              {% for subfield in form.payment_method %}
-              <div class="form-check">
-                {{ subfield(class="form-check-input") }}
-                {{ subfield.label(class="form-check-label") }}
-              </div>
-              {% endfor %}
             </div>
           </div>
 
@@ -66,11 +58,94 @@
                 {{ wtf.render_field(form.phone) }}
                 {{ wtf.render_field(form.address) }}
               </div>
+            </div>
+          </div>
 
-              <div class="mt-4">
-                <button type="submit" class="btn btn-success btn-lg px-4 w-100">
-                  <i class="bi bi-check-circle me-2"></i>Place Order
-                </button>
+          <div class="row">
+            <div class="col card m-3 p-3">
+              <h4>Payment Method</h4>
+              <hr>
+              {% for subfield in form.payment_method %}
+              <div class="form-check">
+                {{ subfield(class="form-check-input") }}
+                {{ subfield.label(class="form-check-label") }}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col card m-3 p-3">
+              <h4>Delivery Method</h4>
+              <hr>
+
+              <div class="delivery-toggle-wrapper">
+                <input type="radio" name="delivery_method" id="delivery_method-0" value="1" checked>
+                <label for="delivery_method-0">Standard Delivery (+$5.00)</label><br>
+
+                <input type="radio" name="delivery_method" id="delivery_method-1" value="2">
+                <label for="delivery_method-1">Express Delivery (+$10.00)</label><br>
+
+                <input type="radio" name="delivery_method" id="delivery_method-2" value="3">
+                <label for="delivery_method-2">Eco Delivery (+$3.00)</label><br>
+
+                <div class="price-box mt-4">
+                  <div id="price-standard" class="price-display border rounded bg-white p-3 shadow-sm">
+                    <div class="row mb-2">
+                      <div class="col-6">Menu Price:</div>
+                      <div class="col-6 text-end">${{ "%.2f"|format(basket.total_cost()) }}</div>
+                    </div>
+                    <div class="row mb-2">
+                      <div class="col-6">Delivery Fee (Standard):</div>
+                      <div class="col-6 text-end">$5.00</div>
+                    </div>
+                    <hr>
+                    <div class="row fw-bold">
+                      <div class="col-6">Total:</div>
+                      <div class="col-6 text-end">${{ "%.2f"|format(basket.total_cost() + 5.00) }}</div>
+                    </div>
+                  </div>
+
+                  <div id="price-express" class="price-display border rounded bg-white p-3 shadow-sm">
+                    <div class="row mb-2">
+                      <div class="col-6">Menu Price:</div>
+                      <div class="col-6 text-end">${{ "%.2f"|format(basket.total_cost()) }}</div>
+                    </div>
+                    <div class="row mb-2">
+                      <div class="col-6">Delivery Fee (Express):</div>
+                      <div class="col-6 text-end">$10.00</div>
+                    </div>
+                    <hr>
+                    <div class="row fw-bold">
+                      <div class="col-6">Total:</div>
+                      <div class="col-6 text-end">${{ "%.2f"|format(basket.total_cost() + 10.00) }}</div>
+                    </div>
+                  </div>
+
+                  <div id="price-eco" class="price-display border rounded bg-white p-3 shadow-sm">
+                    <div class="row mb-2">
+                      <div class="col-6">Menu Price:</div>
+                      <div class="col-6 text-end">${{ "%.2f"|format(basket.total_cost()) }}</div>
+                    </div>
+                    <div class="row mb-2">
+                      <div class="col-6">Delivery Fee (Eco):</div>
+                      <div class="col-6 text-end">$3.00</div>
+                    </div>
+                    <hr>
+                    <div class="row fw-bold">
+                      <div class="col-6">Total:</div>
+                      <div class="col-6 text-end">${{ "%.2f"|format(basket.total_cost() + 3.00) }}</div>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="mt-4">
+                  <button type="submit" class="btn btn-success btn-lg px-4 w-100">
+                    <i class="bi bi-check-circle me-2"></i>Place Order
+                  </button>
+                </div>
+
               </div>
             </div>
           </div>
@@ -80,4 +155,5 @@
     </div>
   </div>
 </section>
+
 {% endblock %}

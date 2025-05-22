@@ -132,8 +132,8 @@ def checkout():
     form = CheckoutForm()
 
     if request.method == 'POST' and form.validate_on_submit():
-        return place_order(form) 
-    
+        return place_order(form)
+
     if request.method == 'GET':
         user = get_user()
         form.firstname.data = user.get('firstname', '')
@@ -141,7 +141,27 @@ def checkout():
         form.phone.data = user.get('phone', '')
 
     basket = get_basket()
-    return render_template("checkout.html", form=form, basket=basket, show_errors=(request.method == 'POST'))
+
+
+    delivery_fees = {
+        'standard': 5,
+        'express': 15,
+        'eco': 0
+    }
+
+    total_prices = {
+        option: float(basket.total_cost())+ fee
+        for option, fee in delivery_fees.items()
+    }
+
+    return render_template(
+        "checkout.html",
+        form=form,
+        basket=basket,
+        show_errors=(request.method == 'POST'),
+        product_total=basket.total_cost,
+        total_prices=total_prices
+    )
 
 @bp.route('/placeorder', methods=['GET', 'POST'])
 def place_order(form):

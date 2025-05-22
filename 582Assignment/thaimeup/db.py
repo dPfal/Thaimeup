@@ -346,3 +346,9 @@ def update_order_status_in_db(order_id: int, new_status: str):
     print(f"[DB] Rows affected: {cur.rowcount}") 
     conn.commit()
     cur.close()    
+
+def is_username_taken(username):
+    conn = mysql.connection
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT 1 FROM users WHERE username = %s", (username,))
+        return cursor.fetchone() is not None
