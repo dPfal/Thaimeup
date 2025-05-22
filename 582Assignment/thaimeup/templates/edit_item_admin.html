@@ -10,6 +10,15 @@
         <div class="col-5 mb-4">
             <div class="card h-100 d-flex flex-column">
                 <img class="card-img-top" src="{{ url_for('static', filename='img/' + item.image) }}" alt="Card image">
+                {% if item.is_available %}
+                <span class="badge bg-success position-absolute top-0 end-0 m-2 fs-4">
+                    Available
+                </span>
+                {% else %}
+                <span class="badge bg-danger position-absolute top-0 end-0 m-2 fs-4">
+                    Sold Out
+                </span>
+                {% endif %}
 
                 <form method="POST" action="{{ url_for('main.edit_menu', item_id=item.id) }}">
                     {{ form.hidden_tag() }}
