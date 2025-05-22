@@ -123,12 +123,12 @@
                 {% if item.is_available %}
                 <div class="card-footer bg-white border-top-0">
                     <form method="POST" action="{{ url_for('main.adding_to_basket', item_id=item.id) }}">
-                        <button type="submit" class="btn button w-100 ">Add to Cart</button>
+                        <button type="submit" class="btn button w-100 py-2">Add to Cart</button>
                     </form>
                 </div>
                 {% else %}
                 <div class="card-footer bg-white border-top-0">
-                    <button type="button" class="btn btn-secondary w-100" disabled>Sold Out</button>
+                    <button type="button" class="btn btn-secondary w-100 py-2" disabled>Sold Out</button>
                 </div>
                 {% endif %}
                 {% endif %}
