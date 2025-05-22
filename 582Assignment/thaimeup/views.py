@@ -230,7 +230,6 @@ def register():
     if request.method == 'POST':
         if form.validate_on_submit():
             form.password.data = sha256(form.password.data.encode()).hexdigest()
-            # Check if the user already exists
             add_user(form)
             flash('Registration successful!')
             return redirect(url_for('main.login'))
@@ -268,11 +267,6 @@ def edit_menu(item_id):
 
     if request.method == 'POST':
         if form.validate_on_submit():
-            print("🔄 Updating item:")
-            print(" - name:", form.name.data)
-            print(" - description:", form.description.data)
-            print(" - price:", form.price.data)
-            print(" - category:", form.category.data)
             update_item(
                 item_id,
                 form.name.data,
@@ -318,10 +312,6 @@ def mark_available(item_id):
 @bp.route('/admin/update_order_status/<int:order_id>', methods=['POST'])
 @only_admins
 def update_order_status(order_id):
-    if not session.get('logged_in') or not session.get('is_admin'):
-        flash('Unauthorized access.', 'error')
-        return redirect(url_for('main.index'))
-
     new_status = request.form.get('new_status')
     if new_status not in ['pending', 'completed', 'cancelled']:
         flash('Invalid status.', 'error')
