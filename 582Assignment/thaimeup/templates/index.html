@@ -84,14 +84,17 @@
     <form method="GET" action="{{ url_for('main.index') }}">
         <input type="hidden" name="search" value="{{ search }}">
         <div class="row justify-content-center">
-            {% for cat in ['all', 'Rice', 'Noodle', 'Entree', 'Salad', 'Curry'] %}
+            <div class="col-md-2 mb-2">
+                <button type="submit" name="category" value="all"
+                    class="btn {% if category == 'all' %}btn-secondary{% else %}btn-light{% endif %} w-100">
+                    📋 All
+                </button>
+            </div>
+            {% for cat in categories %}
             <div class="col-md-2 mb-2">
                 <button type="submit" name="category" value="{{ cat }}"
                     class="btn {% if category == cat %}btn-secondary{% else %}btn-light{% endif %} w-100">
-                    <span class="category-icon">
-                        {% if cat == 'all' %}📋{% elif cat == 'Rice' %}🍚{% elif cat == 'Noodle' %}🍝{% elif cat ==
-                        'Entree' %}🥙{% elif cat == 'Salad' %}🥗{% elif cat == 'Curry' %}🍛{% endif %}
-                    </span> {{ cat }}
+                    {{ cat }}
                 </button>
             </div>
             {% endfor %}

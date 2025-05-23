@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
 from thaimeup import mysql
-from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db
+from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db, get_all_categories, search_items, get_items_by_category
 from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_category,insert_item,get_categories
 from thaimeup.session import get_basket, add_to_basket, empty_basket, get_user
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddCategoryForm,AddItemForm,EditItemForm
@@ -15,26 +15,17 @@ bp = Blueprint('main', __name__)
 @bp.route('/', methods=['GET'])
 def index():
     category = request.args.get('category', 'all')
-    search   = request.args.get('search', '').strip()
-
-    items = get_items()
-
-    if category != 'all':
-        items = [item for item in items if item.category.lower() == category.lower()]
+    search = request.args.get('search', '').strip()
+    categories = get_all_categories()
 
     if search:
-        items = [
-            item for item in items
-            if search.lower() in item.name.lower()
-               or search.lower() in item.description.lower()
-               or search.lower() in item.category]
+        items = search_items(search)
+    elif category == 'all':
+        items = get_items()
+    else:
+        items = get_items_by_category(category)
 
-    return render_template(
-        'index.html',
-        items=items,
-        category=category,
-        search=search
-    )
+    return render_template('index.html', items=items, categories=categories, category=category, search=search)
 
 
 

@@ -21,6 +21,48 @@ def get_items():
             row['price'], bool(row['is_available']), row['image']) for row in results]
 
 
+def get_all_categories():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT DISTINCT category_name FROM categories")
+    rows = cur.fetchall()
+    cur.close()
+    return [row['category_name'] for row in rows]
+
+def get_items_by_category(category_name):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT items.item_id, items.name, items.description, categories.category_name, 
+               items.price, items.image, items.is_available 
+        FROM items 
+        INNER JOIN categories ON items.category_id = categories.category_id 
+        WHERE categories.category_name = %s
+    """, (category_name,))
+    rows = cur.fetchall()
+    cur.close()
+    return [
+        Item(
+            str(row['item_id']), row['name'], row['description'],
+            row['category_name'], row['price'], bool(row['is_available']),
+            row['image']
+        )
+        for row in rows
+    ]
+
+def search_items(search):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT items.item_id, items.name, items.description, categories.category_name,
+               items.price, items.image, items.is_available
+        FROM items
+        INNER JOIN categories ON items.category_id = categories.category_id
+        WHERE items.name LIKE %s OR categories.category_name LIKE %s
+    """, ('%' + search + '%', '%' + search + '%'))
+    rows = cur.fetchall()
+    cur.close()
+    return [Item(str(row['item_id']), row['name'], row['description'], row['category_name'],
+                 row['price'], bool(row['is_available']), row['image']) for row in rows]
+
+
 def get_item(item_id):
     """Get item data by its ID."""
     cur = mysql.connection.cursor()
