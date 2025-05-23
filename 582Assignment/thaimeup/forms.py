@@ -109,24 +109,6 @@ class AddCategoryForm(FlaskForm):
 
     submit = SubmitField("Add Category")
 
-
-class RegisterForm(FlaskForm):
-    """Form for user registration."""
-
-    username = StringField(
-        "Username",
-        validators=[
-            InputRequired(),
-            Length(min=4, max=20, message="Username must be between 4 and 20 characters.")
-        ]
-    )
-    def validate_username(self, field):
-        if is_username_taken(field.data):
-            raise ValidationError("This username is already taken.")  
-
-
-
-
 class AddItemForm(FlaskForm):
     name = StringField("Menu Name", validators=[InputRequired()])
     description = TextAreaField("Description", validators=[InputRequired()])
