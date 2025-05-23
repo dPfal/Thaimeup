@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms.fields import SubmitField, StringField, PasswordField,SelectField,DecimalField,TextAreaField, RadioField
 from wtforms.validators import InputRequired, email, NumberRange,EqualTo
-from thaimeup.db import is_username_taken,is_phone_taken,is_email_taken
+from thaimeup.db import is_username_taken,is_phone_taken,is_email_taken,is_category_taken
 from wtforms import ValidationError
 
 class CheckoutForm(FlaskForm):
@@ -97,6 +97,33 @@ class RegisterForm(FlaskForm):
     )
 
     submit = SubmitField("Create Account")
+
+
+class AddCategoryForm(FlaskForm):
+    category = StringField("Category Name", validators=[InputRequired()])
+
+    def validate_category(self, field):
+        category_name = field.data.strip().lower()
+        if is_category_taken(category_name):
+            raise ValidationError("This category already exists.")  
+
+    submit = SubmitField("Add Category")
+
+
+class RegisterForm(FlaskForm):
+    """Form for user registration."""
+
+    username = StringField(
+        "Username",
+        validators=[
+            InputRequired(),
+            Length(min=4, max=20, message="Username must be between 4 and 20 characters.")
+        ]
+    )
+    def validate_username(self, field):
+        if is_username_taken(field.data):
+            raise ValidationError("This username is already taken.")  
+
 
 
 

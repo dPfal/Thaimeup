@@ -2,9 +2,9 @@ from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
 from thaimeup import mysql
 from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db
-from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_item,get_categories
+from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_category,insert_item,get_categories
 from thaimeup.session import get_basket, add_to_basket, empty_basket, get_user
-from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddItemForm,EditItemForm
+from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddCategoryForm,AddItemForm,EditItemForm
 from thaimeup.models import UserAccount,UserInfo, BasketItem, Basket, Order, OrderStatus
 from hashlib import sha256
 from thaimeup.wrappers import only_admins
@@ -236,6 +236,24 @@ def register():
 
     return render_template('register.html', form=form)
 
+
+
+
+@bp.route('/admin/add-category/', methods=['GET', 'POST'])
+@only_admins
+def add_category():
+    form = AddCategoryForm()
+
+    if form.validate_on_submit():
+        name = form.category.data
+        insert_category(name)
+        flash("Category added successfully.")
+        return redirect(url_for('main.index'))
+
+    return render_template('add_category_admin.html', form=form)
+
+
+
 @bp.route('/admin/add/', methods=['GET', 'POST'])
 @only_admins
 def add_item():
@@ -254,6 +272,8 @@ def add_item():
         return redirect(url_for('main.index'))
 
     return render_template('add_item_admin.html', form=form)
+
+
 
 @bp.route('/admin/edit/<int:item_id>/', methods=['GET', 'POST'])
 @only_admins

@@ -281,6 +281,21 @@ def get_categories():
     cur.close()
     return [(c['category_id'], c['category_name']) for c in categories]
 
+def insert_category(category_name):
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        INSERT INTO categories (category_name)
+        VALUES (%s)
+    """, (category_name,))
+    mysql.connection.commit()
+    cur.close()
+
+def is_category_taken(category_name):
+    conn = mysql.connection
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT 1 FROM categories WHERE category_name = %s", (category_name,))
+        return cursor.fetchone() is not None   
+
 def insert_item(name, description, price,image,category_id, is_available):
     cur = mysql.connection.cursor()
     cur.execute("""
@@ -354,3 +369,4 @@ def is_phone_taken(phone):
     with conn.cursor() as cursor:
         cursor.execute("SELECT 1 FROM users WHERE phone = %s", (phone,))
         return cursor.fetchone() is not None
+    
