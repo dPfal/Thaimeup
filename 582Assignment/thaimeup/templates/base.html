@@ -38,7 +38,7 @@
     </style>
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
     <header>
         <nav class="navbar navbar-expand-lg navbar-light sticky-top shadow px-5" style="background-color: #FF8C3F">
             <a class="navbar-brand text-light" href="{{ url_for('main.index') }}">
@@ -133,13 +133,14 @@
     </header>
 
     <div class="container-md mt-5 mb-5" style="max-width: 1200px;">
-        <main>
+        <main class="flex-fill d-flex justify-content-center align-items-center">
+            <div class="container-md" style="max-width:1200px;">
             {% block main %}
             {% endblock %}
         </main>
     </div>
 
-    <footer class="bg-dark text-light py-4">
+    <footer class="mt-auto bg-dark text-light py-4">
         <div class="container">
             <div class="row gx-5">
                 <div class="col-12 col-md-auto mb-3">
