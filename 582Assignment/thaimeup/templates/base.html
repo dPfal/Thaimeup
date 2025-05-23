@@ -64,6 +64,12 @@
                     <li class="nav-item">
                         <a class="nav-link text-light" href="/discounts.html">Offers</a>
                     </li>
+                      <li class="nav-item">
+                        <a class="nav-link text-light" href="{{ url_for('main.trigger_500') }}">
+                            test 500
+                        </a>
+                        </li>
+
                     {% if session.get('is_admin') %}
                     <li class="nav-item">
                         <a class="nav-link text-light" href="{{ url_for('main.orders') }}">Orders</a>

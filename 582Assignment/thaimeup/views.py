@@ -341,3 +341,9 @@ def update_order_status(order_id):
 
     flash(f"Order #{order_id} status updated to {new_status.capitalize()}.")
     return redirect(url_for('main.orders'))
+    
+
+    
+@bp.route('/trigger-500')
+def trigger_500():
+    raise RuntimeError("Error")
