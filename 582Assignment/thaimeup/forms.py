@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, DecimalField, SelectField, RadioField
 from wtforms.validators import InputRequired, Length, Email, EqualTo, ValidationError, Regexp, NumberRange
 from wtforms import ValidationError
-from thaimeup.db import is_username_taken, is_email_taken, is_phone_taken
+from thaimeup.db import is_username_taken, is_email_taken, is_phone_taken, is_category_taken
 
 class CheckoutForm(FlaskForm):
     """Form for user checkout."""
