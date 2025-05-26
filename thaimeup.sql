@@ -1,3 +1,6 @@
+USE thaimeup;
+
+
 DROP TABLE IF EXISTS order_items, orders, items, categories, delivery_options, users;
 
 -- Categories table
