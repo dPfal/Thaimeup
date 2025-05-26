@@ -1,13 +1,6 @@
-<<<<<<< HEAD
-from flask_wtf import FlaskForm
-from wtforms.fields import SubmitField, StringField, PasswordField,SelectField,DecimalField,TextAreaField, RadioField
-from wtforms.validators import InputRequired, email, NumberRange,EqualTo
-from thaimeup.db import is_username_taken,is_phone_taken,is_email_taken,is_category_taken
-=======
 from flask_wtf import FlaskForm 
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, DecimalField, SelectField, RadioField
 from wtforms.validators import InputRequired, Length, Email, EqualTo, ValidationError, Regexp, NumberRange
->>>>>>> b8c7514 (fix: form)
 from wtforms import ValidationError
 from thaimeup.db import is_username_taken, is_email_taken, is_phone_taken
 
