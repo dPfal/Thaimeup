@@ -1,14 +1,40 @@
+<<<<<<< HEAD
 from flask_wtf import FlaskForm
 from wtforms.fields import SubmitField, StringField, PasswordField,SelectField,DecimalField,TextAreaField, RadioField
 from wtforms.validators import InputRequired, email, NumberRange,EqualTo
 from thaimeup.db import is_username_taken,is_phone_taken,is_email_taken,is_category_taken
+=======
+from flask_wtf import FlaskForm 
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, DecimalField, SelectField, RadioField
+from wtforms.validators import InputRequired, Length, Email, EqualTo, ValidationError, Regexp, NumberRange
+>>>>>>> b8c7514 (fix: form)
 from wtforms import ValidationError
+from thaimeup.db import is_username_taken, is_email_taken, is_phone_taken
 
 class CheckoutForm(FlaskForm):
     """Form for user checkout."""
-    firstname = StringField("First name", validators=[InputRequired()])
-    surname = StringField("Last name", validators=[InputRequired()])
-    phone = StringField("Phone Number", validators=[InputRequired()])
+    firstname = StringField(
+        "First Name",
+        validators=[
+            InputRequired(),
+            Length(max=30, message="First name must be under 30 characters.")
+        ]
+    )
+
+    surname = StringField(
+        "Surname",
+        validators=[
+            InputRequired(),
+            Length(max=30, message="Surname must be under 30 characters.")
+        ]
+    )
+    phone = StringField(
+        "Phone Number",
+        validators=[
+            InputRequired(),
+            Regexp(r'^\d{9,15}$', message="Enter a valid phone number (9–15 digits).")
+        ]
+    )
     address = StringField("Address", validators=[InputRequired()])
 
     delivery_method = RadioField("Delivery Method", choices=[
@@ -31,9 +57,6 @@ class LoginForm(FlaskForm):
     password = PasswordField("Password", validators = [InputRequired()])
     submit = SubmitField("Login")
 
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, Email, Regexp
 
 class RegisterForm(FlaskForm):
     """Form for user registration."""
