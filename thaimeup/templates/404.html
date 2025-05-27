@@ -1,41 +1,14 @@
 {% extends 'base.html' %}
 
 {% block head %}
-  <style>
-  
-    .error-container {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: rgb(249, 123, 32);
-    }
-    
-    .error-container h1 {
-      font-size: 5rem;
-      display: inline-block;
-      margin: 0;
-      position: relative;
-    }
-   
-    .error-container h1::after {
-      content: "🙇";
-      font-size: 5rem;
-      margin-left: 0.5rem;
-      vertical-align: middle;
-      display: inline-block;
-    }
-    
-    .error-container p {
-      font-size: 1.5rem;
-      margin: 1.5rem 0;
-    }
-  </style>
+
 {% endblock %}
 
 {% block main %}
-   <div class="error-container">
-    <h1>404</h1>
-    <p>
-        Sorry, but we cannot find what you are looking for. 
-    </p>
-   </div>
+<div class="error-container">
+  <h1>404</h1>
+  <p>
+    Sorry, but we cannot find what you are looking for.
+  </p>
+</div>
 {% endblock %}
