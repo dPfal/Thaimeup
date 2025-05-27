@@ -1,3 +1,4 @@
+CREATED DATABASE IF NOT EXISTS thaimeup;
 USE thaimeup;
 
 
@@ -96,5 +97,5 @@ CREATE TABLE order_items (
   FOREIGN KEY (item_id) REFERENCES items(item_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `order_items` VALUES (1,1,4,2),(2,1,8,1),(3,2,11,1),(4,2,6,2),(5,2,7,1),(6,3,9,2);
 INSERT INTO `orders` VALUES (1,2,'2025-05-27 16:14:02',1,'123456789','shop 1356/2049 Logan Road','regular','regular','COMPLETED','PayPal'),(2,3,'2025-05-27 16:14:41',2,'1235123623','694 Brunswick Street, New Farm','regular2','regular2','CANCELLED','Apple Pay'),(3,4,'2025-05-27 16:15:29',3,'1235124623','P block 2 George Street, Brisbane City QLD 4000, Australia','regular3','regular3','PENDING','Credit/Debit Card');
+INSERT INTO `order_items` VALUES (1,1,4,2),(2,1,8,1),(3,2,11,1),(4,2,6,2),(5,2,7,1),(6,3,9,2);
