@@ -37,6 +37,8 @@ CREATE TABLE users (
   PRIMARY KEY (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO `users` VALUES (2,'regular1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','regular1@gmail.com','regular','regular',0,'123456789'),(3,'regular2','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','regular2@gmail.com','regular2','regular2',0,'1235123623'),(4,'regular3','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','regular3@gmail.com','regular3','regular3',0,'1235124623'),(5,'admin1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','admin@gmail.com','admin','admin',1,'1235123656'),(6,'admin2','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','admin2@gmail.com','admin2','admin2',1,'1231246234');
+
 -- Items table
 CREATE TABLE items (
   item_id INT NOT NULL AUTO_INCREMENT,
@@ -83,6 +85,7 @@ CREATE TABLE orders (
   FOREIGN KEY (delivery_id) REFERENCES delivery_options(delivery_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 CREATE TABLE order_items (
   order_item_id INT NOT NULL AUTO_INCREMENT,
   order_id INT,
@@ -92,3 +95,6 @@ CREATE TABLE order_items (
   FOREIGN KEY (order_id) REFERENCES orders(order_id),
   FOREIGN KEY (item_id) REFERENCES items(item_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `order_items` VALUES (1,1,4,2),(2,1,8,1),(3,2,11,1),(4,2,6,2),(5,2,7,1),(6,3,9,2);
+INSERT INTO `orders` VALUES (1,2,'2025-05-27 16:14:02',1,'123456789','shop 1356/2049 Logan Road','regular','regular','COMPLETED','PayPal'),(2,3,'2025-05-27 16:14:41',2,'1235123623','694 Brunswick Street, New Farm','regular2','regular2','CANCELLED','Apple Pay'),(3,4,'2025-05-27 16:15:29',3,'1235124623','P block 2 George Street, Brisbane City QLD 4000, Australia','regular3','regular3','PENDING','Credit/Debit Card');
