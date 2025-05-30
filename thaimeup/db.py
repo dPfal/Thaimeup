@@ -14,6 +14,7 @@ def get_items():
     items.price, items.image, items.is_available 
     FROM items 
     INNER JOIN categories ON items.category_id = categories.category_id
+    WHERE items.is_deleted = 0
     """)
     results = cur.fetchall()
     cur.close()
@@ -35,7 +36,7 @@ def get_items_by_category(category_name):
                items.price, items.image, items.is_available 
         FROM items 
         INNER JOIN categories ON items.category_id = categories.category_id 
-        WHERE categories.category_name = %s
+        WHERE categories.category_name = %s AND items.is_deleted = 0
     """, (category_name,))
     rows = cur.fetchall()
     cur.close()
@@ -381,6 +382,12 @@ def update_item(item_id, new_name, new_description, new_price, new_category_id):
     cur.close()
     print("[DB] ✅ Commit complete")
 
+def mark_item_as_deleted(item_id):
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE items SET is_deleted = 1 WHERE item_id = %s", (item_id,))
+    mysql.connection.commit()
+    cur.close()
+
 def delete_item(item_id):
     cur = mysql.connection.cursor()
     cur.execute("DELETE FROM items WHERE item_id = %s", (item_id,))
@@ -400,7 +407,7 @@ def mark_item_as_unavailable(item_id):
     cur.close()    
 
 def update_order_status_in_db(order_id: int, new_status: str):
-    """Update the status of a specific order in the database."""
+    """Update the status of a specific order in the database"""
     conn = mysql.connection
     cur = conn.cursor()
     new_status = new_status.upper() 
@@ -409,6 +416,20 @@ def update_order_status_in_db(order_id: int, new_status: str):
     print(f"[DB] Rows affected: {cur.rowcount}") 
     conn.commit()
     cur.close()    
+
+
+def status_orders_for_item(item_id):
+    """Order statuses that include the item to be removed"""
+    cur = mysql.connection.cursor()
+    cur.execute("""
+        SELECT DISTINCT o.status
+        FROM order_items oi
+        JOIN orders o ON oi.order_id = o.order_id
+        WHERE oi.item_id = %s
+    """, (item_id,))
+    rows = cur.fetchall()
+    cur.close()
+    return [row['status'] for row in rows]
 
 def is_username_taken(username):
     conn = mysql.connection

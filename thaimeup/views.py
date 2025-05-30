@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
 from thaimeup import mysql
 from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db, get_all_categories, search_items, get_items_by_category
-from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_category,delete_category,insert_item,get_categories,get_category_name
+from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available,status_orders_for_item, mark_item_as_deleted,insert_category,delete_category,insert_item,get_categories,get_category_name
 from thaimeup.session import get_basket, add_to_basket, empty_basket, get_user
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddCategoryForm,DeleteCategoryForm,AddItemForm,EditItemForm
 from thaimeup.models import UserAccount,UserInfo, BasketItem, Basket, Order, OrderStatus
@@ -318,9 +318,17 @@ def edit_menu(item_id):
 @bp.route('/admin/delete/<int:item_id>/', methods=['POST'])
 @only_admins
 def delete_menu(item_id):
-    delete_item(item_id)
-    flash('Item deleted.')
-    return redirect(url_for('main.index'))
+    statuses = status_orders_for_item(item_id)
+
+    if not statuses:
+        mark_item_as_deleted(item_id)
+        flash("Item deleted successfully.")
+    elif any(status not in ['COMPLETED', 'CANCELLED'] for status in statuses):
+        flash("This item is part of pending order(s). Please complete or cancel the order(s) to remove it.")
+    else:
+        mark_item_as_deleted(item_id)
+        flash("Item deleted.")
+    return redirect(url_for('main.index', item_id=item_id))
 
 @bp.route('/admin/unavailable/<int:item_id>/', methods=['POST'])
 @only_admins
