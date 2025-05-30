@@ -116,14 +116,18 @@ class RegisterForm(FlaskForm):
 
 
 class AddCategoryForm(FlaskForm):
-    category = StringField("Category Name", validators=[InputRequired()])
+    category = StringField("New Category", validators=[InputRequired()])
 
     def validate_category(self, field):
         category_name = field.data.strip().lower()
         if is_category_taken(category_name):
             raise ValidationError("This category already exists.")  
 
-    submit = SubmitField("Add Category")
+    submit = SubmitField("Add")
+
+class DeleteCategoryForm(FlaskForm):
+    category_id = SelectField("Current Categories", coerce=int, validators=[InputRequired()])
+    submit = SubmitField("Delete")
 
 class AddItemForm(FlaskForm):
     name = StringField("Menu Name", validators=[InputRequired()])

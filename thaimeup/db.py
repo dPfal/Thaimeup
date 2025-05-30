@@ -323,12 +323,28 @@ def get_categories():
     cur.close()
     return [(c['category_id'], c['category_name']) for c in categories]
 
-def insert_category(category_name):
+def get_category_name(category_id):
+    cur = mysql.connection.cursor()
+    cur.execute(
+        "SELECT category_name FROM categories WHERE category_id = %s",
+        (category_id,)
+    )
+    row = cur.fetchone()
+    cur.close()
+    return row['category_name'] if row else None
+
+def insert_category(category_name,):
     cur = mysql.connection.cursor()
     cur.execute("""
         INSERT INTO categories (category_name)
         VALUES (%s)
     """, (category_name,))
+    mysql.connection.commit()
+    cur.close()
+
+def delete_category(category_id):
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM categories where category_id =%s", (category_id,))
     mysql.connection.commit()
     cur.close()
 

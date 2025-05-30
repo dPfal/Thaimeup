@@ -2,9 +2,9 @@ from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
 from thaimeup import mysql
 from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db, get_all_categories, search_items, get_items_by_category
-from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_category,insert_item,get_categories
+from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_category,delete_category,insert_item,get_categories,get_category_name
 from thaimeup.session import get_basket, add_to_basket, empty_basket, get_user
-from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddCategoryForm,AddItemForm,EditItemForm
+from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddCategoryForm,DeleteCategoryForm,AddItemForm,EditItemForm
 from thaimeup.models import UserAccount,UserInfo, BasketItem, Basket, Order, OrderStatus
 from hashlib import sha256
 from thaimeup.wrappers import only_admins
@@ -230,18 +230,34 @@ def register():
 
 
 
-@bp.route('/admin/add-category/', methods=['GET', 'POST'])
+@bp.route('/admin/manage-categories/', methods=['GET', 'POST'])
 @only_admins
-def add_category():
-    form = AddCategoryForm()
+def manage_categories():
+    add_form = AddCategoryForm()
+    delete_form = DeleteCategoryForm()
+    delete_form.category_id.choices = get_categories()
 
-    if form.validate_on_submit():
-        name = form.category.data
+    if add_form.validate_on_submit() and add_form.submit.data:
+        name = add_form.category.data
         insert_category(name)
         flash("Category added successfully.")
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.manage_categories'))
+    
+    if delete_form.validate_on_submit() and delete_form.submit.data:
+        category_id = delete_form.category_id.data
+        category_name = get_category_name(category_id)
 
-    return render_template('add_category_admin.html', form=form)
+        items = get_items_by_category(category_name)
+        if items:
+            flash("This category is associated with menu products. Please edit those products in order to delete it.")
+            return redirect(url_for('main.manage_categories'))
+
+        delete_category(category_id)
+        flash("Category deleted successfully.")
+        return redirect(url_for('main.manage_categories'))
+    
+
+    return render_template('manage_categories_admin.html', add_form=add_form, delete_form=delete_form)
 
 
 
