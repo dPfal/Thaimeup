@@ -21,7 +21,6 @@ def add_to_basket(item_id, quantity=1):
     basket = get_basket()
     item_obj = get_item(item_id)
 
-    print("[DEBUG] Current basket items:")
     for item in basket.items:
         print(" - item.item:", item.item, "| item.id:", getattr(item.item, 'id', 'N/A'))
 
@@ -47,11 +46,6 @@ def add_to_basket(item_id, quantity=1):
         ]
     }
 
-def remove_from_basket(basket_item_id):
-    basket = get_basket() 
-    basket.remove_item_basket(basket_item_id)
-    # now store/update the basket in the session
-    session['basket'] = basket
 
 def empty_basket():
     session['basket'] = {"items": []}

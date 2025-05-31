@@ -60,12 +60,6 @@ class Basket:
     def remove_item_basket(self, item: BasketItem):
         """Remove item from the basket by its ID."""
         self.items = [i for i in self.items if i.id != item.id]
-
-    def get_item_basket(self, item_id: str):
-        """Get item from the basket by its ID."""
-        for i in self.items:
-            if i.id == item_id:
-                return i
     
     def empty(self):
         """Empty the basket."""
@@ -79,7 +73,6 @@ class OrderStatus(Enum):
     PENDING = 'PENDING'
     COMPLETED = 'COMPLETED'
     CANCELLED = 'CANCELLED'
-    #status: bool
 
     def is_pending(self):
         return self == OrderStatus.PENDING
@@ -95,8 +88,8 @@ class Order:
     items: List['BasketItem'] = field(default_factory=list)
     date: datetime = field(default_factory=datetime.now)
 
-    delivery_method: str = 'Standard'      # ex) 'Standard', 'Express', 'Eco'
-    payment_method: str = 'Credit Card'    # ex) 'Credit Card', 'PayPal', 'Apple Pay'
+    delivery_method: str = 'Standard'     
+    payment_method: str = 'Credit Card'  
     recipient_phone: str = ''
     recipient_address: str = ''
     recipient_first_name: str = ''

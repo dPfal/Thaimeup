@@ -79,49 +79,6 @@ def get_item(item_id):
     return Item(str(row['item_id']), row['name'], row['description'], row['category_name'],
                  row['price'], bool(row['is_available']), row['image']) if row else None
 
-def insert_order_with_items(order, form):
-    conn = mysql.connection
-    cur = conn.cursor()
-
-    sql = """
-    INSERT INTO orders (
-        user_id, order_date_time, delivery_id,
-        recipient_phone, recipient_address,
-        recipient_first_name, recipient_last_name,
-        payment_method, total_cost, status
-    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    values = (
-        order.user['user_id'],
-        datetime.now(),
-        form.delivery_method.data,
-        form.phone.data,
-        form.address.data,
-        form.firstname.data,
-        form.surname.data,
-        form.payment_method.data,
-        order.total_cost,
-        'PENDING'
-    )
-
-    cur.execute(sql, values)
-    order_id = cur.lastrowid
-
-    for item in order.items:
-        cur.execute("""
-            INSERT INTO order_items (order_id, item_id, quantity, price)
-            VALUES (%s, %s, %s, %s)
-        """, (
-            order_id,
-            item.item.id,
-            item.quantity,
-            item.item.price
-        ))
-
-    conn.commit()
-    cur.close()
-    return order_id
-
 
 def get_orders():
     cur = mysql.connection.cursor()
@@ -237,43 +194,10 @@ def insert_order(order, form):
     cur.close()
     return order_id
 
-def mark_order_as_pending(order_id):
-    cur = mysql.connection.cursor()
-    cur.execute("UPDATE orders SET status = 0 WHERE order_id = %s", (order_id,))
-    mysql.connection.commit()
-    cur.close()
-
-def mark_order_as_completed(order_id):
-    cur = mysql.connection.cursor()
-    cur.execute("UPDATE orders SET status = 1 WHERE order_id = %s", (order_id,))
-    mysql.connection.commit()
-    cur.close()  
 
 
 
-def get_user_by_id(user_id):
-    cur = mysql.connection.cursor()
-    cur.execute("""
-        SELECT user_id, username, password_hash, email, first_name, last_name, phone
-        FROM users
-        WHERE user_id = %s
-    """, (user_id,))
-    row = cur.fetchone()
-    cur.close()
-    if row:
-        return UserAccount(
-            username=row['username'],
-            password=row['password_hash'],
-            email=row['email'],
-            info=UserInfo(
-                id=str(row['user_id']),
-                firstname=row['first_name'],
-                surname=row['last_name'],
-                email=row['email'],
-                phone=row['phone']
-            )
-        )
-    return None
+
 
 
 def check_for_user(username, password):
@@ -365,8 +289,6 @@ def insert_item(name, description, price,image,category_id, is_available):
     cur.close()
 
 def update_item(item_id, new_name, new_description, new_price, new_category_id):
-    print(f"[DB] Updating item {item_id}...")
-    print(f"name={new_name}, price={new_price}, category={new_category_id}")
     
     cur = mysql.connection.cursor()
     sql = """
@@ -380,7 +302,6 @@ def update_item(item_id, new_name, new_description, new_price, new_category_id):
     cur.execute(sql, (new_name, new_description, new_price, new_category_id, item_id))
     mysql.connection.commit()
     cur.close()
-    print("[DB] ✅ Commit complete")
 
 def mark_item_as_deleted(item_id):
     cur = mysql.connection.cursor()
@@ -411,9 +332,7 @@ def update_order_status_in_db(order_id: int, new_status: str):
     conn = mysql.connection
     cur = conn.cursor()
     new_status = new_status.upper() 
-    print(f"[DB] Updating order {order_id} status to {new_status}...")
     cur.execute("UPDATE orders SET status = %s WHERE order_id = %s", (new_status, order_id))
-    print(f"[DB] Rows affected: {cur.rowcount}") 
     conn.commit()
     cur.close()    
 

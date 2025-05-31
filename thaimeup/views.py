@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
 from thaimeup import mysql
-from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db, get_all_categories, search_items, get_items_by_category
-from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available, delete_item,insert_category,insert_item,get_categories
+from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db, get_all_categories, search_items, get_items_by_category, get_category_name, delete_category
+from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available,status_orders_for_item, mark_item_as_deleted, insert_category,insert_item,get_categories
 from thaimeup.session import get_basket, add_to_basket, empty_basket, get_user
-from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddCategoryForm,AddItemForm,EditItemForm
+from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddCategoryForm,AddItemForm,EditItemForm, DeleteCategoryForm
 from thaimeup.models import UserAccount,UserInfo, BasketItem, Basket, Order, OrderStatus
 from hashlib import sha256
 from thaimeup.wrappers import only_admins
@@ -31,11 +31,9 @@ def index():
 
 @bp.route('/itemdetails/<int:itemid>/', methods=['GET'])
 def itemdetails(itemid):
-    # 1. 先拿到 query string 的 quantity 和 action
     quantity = request.args.get('quantity', 1, type=int)
     action   = request.args.get('action')
 
-    # 2. 根据 action 调整 quantity，并在越界时 flash 警告
     if action == 'decrease':
         if quantity <= 1:
             flash("The quantity must be at least 1", "error")
@@ -48,10 +46,8 @@ def itemdetails(itemid):
         else:
             quantity += 1
 
-    # 3. 再做一次边界保护
     quantity = max(1, min(quantity, 10))
 
-    # 4. 取出 item 并把 quantity 一并传给 template
     item = get_item(itemid)
     return render_template(
         'itemdetails.html',
@@ -64,23 +60,18 @@ def itemdetails(itemid):
 @bp.route('/order/', methods = ['POST', 'GET'])
 def order():
     item_id = request.args.get('item_id')
-    # is this a new order?
     if 'order_id'not in session:
-        session['order_id'] = 1 # arbitry, we could set either order 1 or order 2
+        session['order_id'] = 1 
     
-    #retrieve correct order object
     order = get_basket()
-    # are we adding an item? - will be implemented later with DB
     if item_id:
         add_to_basket(item_id, 1)
-        print('Added item_id={} to basket.'.format(item_id))
 
     return render_template('basket.html', order=order, totalprice=float(order.total_cost()))
 
 @bp.route('/basket/<int:item_id>/', methods = ['POST', 'GET'])
 def adding_to_basket(item_id):
     add_to_basket(item_id, 1)
-    print(get_basket())
     return redirect(url_for('main.order'))
 
 @bp.route('/basket/<int:item_id>/<int:quantity>/', methods = ['POST', 'GET'])
@@ -90,14 +81,11 @@ def adding_to_basket_with_quantity(item_id, quantity):
 
 @bp.route('/clearbasket/', methods = ['POST', 'GET'])
 def clear_basket():
-    print('User wants to clear the basket')
     session['basket'] = {"items": []}
-    print(get_basket())
     return redirect(url_for('main.order'))
 
 @bp.route('/removebasketitem/<int:item_id>/', methods = ['POST', 'GET'])
 def remove_basketitem(item_id):
-    print(f'User wants to delete basket item with id={item_id}')
     basket_data = session.get('basket', {"items": []})
     basket_data["items"] = [item for item in basket_data["items"] if str(item["id"]) != str(item_id)]
     session["basket"] = basket_data
@@ -161,24 +149,12 @@ def checkout():
     basket = get_basket()
 
 
-    delivery_fees = {
-        'standard': 5,
-        'express': 15,
-        'eco': 0
-    }
-
-    total_prices = {
-        option: float(basket.total_cost())+ fee
-        for option, fee in delivery_fees.items()
-    }
-
     return render_template(
         "checkout.html",
         form=form,
         basket=basket,
         show_errors=(request.method == 'POST'),
         product_total=basket.total_cost,
-        total_prices=total_prices
     )
 
 @bp.route('/placeorder', methods=['GET', 'POST'])
@@ -257,18 +233,35 @@ def register():
 
 
 
-@bp.route('/admin/add-category/', methods=['GET', 'POST'])
+@bp.route('/admin/manage-categories/', methods=['GET', 'POST'])
 @only_admins
-def add_category():
-    form = AddCategoryForm()
+def manage_categories():
+    add_form = AddCategoryForm()
+    delete_form = DeleteCategoryForm()
+    delete_form.category_id.choices = get_categories()
 
-    if form.validate_on_submit():
-        name = form.category.data
+    if add_form.validate_on_submit() and add_form.submit.data:
+        name = add_form.category.data
         insert_category(name)
         flash("Category added successfully.")
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.manage_categories'))
+    
+    if delete_form.validate_on_submit() and delete_form.submit.data:
+        category_id = delete_form.category_id.data
+        category_name = get_category_name(category_id)
 
-    return render_template('add_category_admin.html', form=form)
+        items = get_items_by_category(category_name)
+        if items:
+            flash("This category is associated with menu products. Please edit those products in order to delete it.")
+            return redirect(url_for('main.manage_categories'))
+
+        delete_category(category_id)
+        flash("Category deleted successfully.")
+        return redirect(url_for('main.manage_categories'))
+    
+
+    return render_template('manage_categories_admin.html', add_form=add_form, delete_form=delete_form)
+
 
 
 
@@ -316,7 +309,6 @@ def edit_menu(item_id):
             return redirect(url_for("main.edit_menu", item_id=item_id))
         else:
             flash("Fail.")
-            print(form.errors)
 
     elif request.method == 'GET':
         form.name.data = item.name
@@ -329,9 +321,17 @@ def edit_menu(item_id):
 @bp.route('/admin/delete/<int:item_id>/', methods=['POST'])
 @only_admins
 def delete_menu(item_id):
-    delete_item(item_id)
-    flash('Item deleted.')
-    return redirect(url_for('main.index'))
+    statuses = status_orders_for_item(item_id)
+
+    if not statuses:
+        mark_item_as_deleted(item_id)
+        flash("Item deleted successfully.")
+    elif any(status not in ['COMPLETED', 'CANCELLED'] for status in statuses):
+        flash("This item is part of pending order(s). Please complete or cancel the order(s) to remove it.")
+    else:
+        mark_item_as_deleted(item_id)
+        flash("Item deleted.")
+    return redirect(url_for('main.index', item_id=item_id))
 
 @bp.route('/admin/unavailable/<int:item_id>/', methods=['POST'])
 @only_admins
