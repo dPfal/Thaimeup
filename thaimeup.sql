@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `thaimeup` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `thaimeup`;
 -- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
 --
 -- Host: localhost    Database: thaimeup
@@ -27,8 +25,9 @@ DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories` (
   `category_id` int NOT NULL AUTO_INCREMENT,
   `category_name` varchar(50) NOT NULL,
+  `is_deleted` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -37,7 +36,7 @@ CREATE TABLE `categories` (
 
 LOCK TABLES `categories` WRITE;
 /*!40000 ALTER TABLE `categories` DISABLE KEYS */;
-INSERT INTO `categories` VALUES (2,'Noodle'),(3,'Entree'),(4,'Salad'),(5,'Curry'),(21,'Rice');
+INSERT INTO `categories` VALUES (2,'Noodle',0),(3,'Entree',0),(4,'Salad',0),(5,'Curry',0),(21,'Rice',0);
 /*!40000 ALTER TABLE `categories` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -85,7 +84,7 @@ CREATE TABLE `items` (
   PRIMARY KEY (`item_id`),
   KEY `category_id` (`category_id`),
   CONSTRAINT `items_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -94,7 +93,7 @@ CREATE TABLE `items` (
 
 LOCK TABLES `items` WRITE;
 /*!40000 ALTER TABLE `items` DISABLE KEYS */;
-INSERT INTO `items` VALUES (1,'Pad Thai','Stir-fried rice noodles with tofu, shrimp, bean sprouts, peanuts, and tamarind sauce',20.90,'padthai.jpeg',2,0,0),(3,'Som Tum','Fresh shredded green papaya with chili, lime, fish sauce, tomatoes, and peanuts',17.90,'somtum.jpeg',4,1,0),(4,'Fried Rice','Fried jasmine rice with eggs, vegetables, and your choice of chicken, shrimp, or tofu',19.00,'friedrice.jpeg',21,1,0),(5,'Roti','Hot Roti',3.00,'roti.jpeg',3,1,0),(6,'Springrolls','Vegetable Springrolls (4pcs)',12.50,'springrolls.jpeg',3,1,0),(7,'Green Curry','Spicy green curry with chicken, eggplant, bamboo shoots, and basil in coconut milk',23.00,'greencurry.jpeg',5,1,0),(8,'Massaman Curry','Rich, mild curry made with beef, potatoes, peanuts, and a touch of cinnamon',24.00,'massaman.jpeg',5,1,0),(9,'Panang Curry','Thick, creamy red curry with beef or chicken, bell peppers, and kaffir lime leaves',21.50,'panang.jpeg',5,1,0),(10,'Thai Fish Cakes','Spicy fish patties with red curry paste and kaffir lime leaves, served with sweet chili sauce',13.90,'fishcake.jpeg',3,1,0),(11,'Tom Yum Soup','Hot and sour soup with shrimp, lemongrass, galangal, lime leaves, and chili',19.50,'tomyum.jpeg',3,1,0),(12,'Larb','Spicy minced chicken salad with lime juice, chili, mint, and roasted rice powder',18.00,'larb.jpeg',4,1,0),(13,'Mango Sticky Rice','Sweet sticky rice served with fresh mango and coconut cream',14.00,'mangosticky.jpeg',3,1,0),(14,'Pad Kee Mao','Spicy stir-fried rice noodles with chili, garlic, basil, and vegetables',21.00,'padkeemao.jpeg',2,1,0),(15,'Thai Satay','Grilled marinated chicken skewers served with peanut sauce and cucumber relish',16.50,'satay.jpeg',3,1,0),(25,'Khao khluk kapi','Fried rice made with shrimp paste and topped with crispy dried shrimps, dried mango gratings, omelet shavings, chilies, cucumbers, red and green onions.',21.00,'khaokhlukkapi.jpeg',21,1,1),(26,'Khanom jeeb','Dumplings stuffed with pork and shrimp paste.\r\n',7.00,'khanomjeeb.jpeg',3,1,1),(27,'Flan','dessert',9.00,'flan.jpeg',2,1,1);
+INSERT INTO `items` VALUES (1,'Pad Thai','Stir-fried rice noodles with tofu, shrimp, bean sprouts, peanuts, and tamarind sauce',20.90,'padthai.jpeg',2,0,0),(3,'Som Tum','Fresh shredded green papaya with chili, lime, fish sauce, tomatoes, and peanuts',17.90,'somtum.jpeg',4,1,0),(4,'Fried Rice','Fried jasmine rice with eggs, vegetables, and your choice of chicken, shrimp, or tofu',19.00,'friedrice.jpeg',21,1,0),(5,'Roti','Hot Roti',3.00,'roti.jpeg',3,1,0),(6,'Springrolls','Vegetable Springrolls (4pcs)',12.50,'springrolls.jpeg',3,1,0),(7,'Green Curry','Spicy green curry with chicken, eggplant, bamboo shoots, and basil in coconut milk',23.00,'greencurry.jpeg',5,1,0),(8,'Massaman Curry','Rich, mild curry made with beef, potatoes, peanuts, and a touch of cinnamon',24.00,'massaman.jpeg',5,1,0),(9,'Panang Curry','Thick, creamy red curry with beef or chicken, bell peppers, and kaffir lime leaves',21.50,'panang.jpeg',5,1,0),(10,'Thai Fish Cakes','Spicy fish patties with red curry paste and kaffir lime leaves, served with sweet chili sauce',13.90,'fishcake.jpeg',3,1,0),(11,'Tom Yum Soup','Hot and sour soup with shrimp, lemongrass, galangal, lime leaves, and chili',19.50,'tomyum.jpeg',3,1,0),(12,'Larb','Spicy minced chicken salad with lime juice, chili, mint, and roasted rice powder',18.00,'larb.jpeg',4,1,0),(13,'Mango Sticky Rice','Sweet sticky rice served with fresh mango and coconut cream',14.00,'mangosticky.jpeg',3,1,0),(14,'Pad Kee Mao','Spicy stir-fried rice noodles with chili, garlic, basil, and vegetables',21.00,'padkeemao.jpeg',2,1,0),(15,'Thai Satay','Grilled marinated chicken skewers served with peanut sauce and cucumber relish',16.50,'satay.jpeg',3,1,0);
 /*!40000 ALTER TABLE `items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -115,7 +114,7 @@ CREATE TABLE `order_items` (
   KEY `item_id` (`item_id`),
   CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
   CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -124,7 +123,7 @@ CREATE TABLE `order_items` (
 
 LOCK TABLES `order_items` WRITE;
 /*!40000 ALTER TABLE `order_items` DISABLE KEYS */;
-INSERT INTO `order_items` VALUES (1,1,4,2),(2,1,8,1),(3,2,11,1),(4,2,6,2),(5,2,7,1),(6,3,9,2),(13,10,25,2),(14,11,26,4);
+INSERT INTO `order_items` VALUES (1,1,4,2),(2,1,8,1),(3,2,11,1),(4,2,6,2),(5,2,7,1),(6,3,9,2);
 /*!40000 ALTER TABLE `order_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -151,7 +150,7 @@ CREATE TABLE `orders` (
   KEY `delivery_id` (`delivery_id`),
   CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
   CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`delivery_id`) REFERENCES `delivery_options` (`delivery_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -160,7 +159,7 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (1,2,'2025-05-27 16:14:02',1,'123456789','shop 1356/2049 Logan Road','regular','regular','COMPLETED','PayPal'),(2,3,'2025-05-27 16:14:41',2,'1235123623','694 Brunswick Street, New Farm','regular2','regular2','CANCELLED','Apple Pay'),(3,4,'2025-05-27 16:15:29',3,'1235124623','P block 2 George Street, Brisbane City QLD 4000, Australia','regular3','regular3','PENDING','Credit/Debit Card'),(10,2,'2025-05-30 15:56:01',1,'123456789','7 Waterford Street, Alderley, QLD, 4051','regular','regular','COMPLETED','PayPal'),(11,2,'2025-05-30 15:56:15',1,'123456789','7 Waterford Street, Alderley, QLD, 4051','regular','regular','CANCELLED','PayPal');
+INSERT INTO `orders` VALUES (1,2,'2025-05-27 16:14:02',1,'123456789','shop 1356/2049 Logan Road','regular','regular','COMPLETED','PayPal'),(2,3,'2025-05-27 16:14:41',2,'1235123623','694 Brunswick Street, New Farm','regular2','regular2','CANCELLED','Apple Pay'),(3,4,'2025-05-27 16:15:29',3,'1235124623','P block 2 George Street, Brisbane City QLD 4000, Australia','regular3','regular3','PENDING','Credit/Debit Card');
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -205,4 +204,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-30 17:00:57
+-- Dump completed on 2025-05-31 23:46:54
