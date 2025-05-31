@@ -1,44 +1,65 @@
 {% extends 'base.html' %}
 
 {% block main %}
-<div class="container-fluid">
+<div class="container-fluid mt-5">
   <div class="row justify-content-center">
     <div class="col-12 col-xl-11">
+
       <div class="row g-4 align-items-start">
+
+        <!-- 左半邊：圖片 -->
         <div class="col-md-6">
           <div class="border rounded shadow-sm p-2 bg-white h-100 d-flex align-items-center justify-content-center">
-            <img src="{{ url_for('static', filename='img/' + item.image) }}"
-                 class="img-fluid"
-                 style="max-height: 500px; object-fit: contain;">
+            <img src="{{ url_for('static', filename='img/' + item.image) }}" class="img-fluid"
+              style="max-height: 500px; object-fit: contain;">
           </div>
         </div>
 
+        <!-- 右半邊：商品資訊 -->
         <div class="col-md-6">
           <div class="p-3 bg-white border rounded shadow-sm h-100 d-flex flex-column">
             <h2 class="fw-bold mb-3">{{ item.name }}</h2>
-            <h4 class="text-danger mb-3">Price: ${{ item.price }}</h4>
+            <h4 class="text-danger mb-3">Price: ${{ '%.2f'|format(item.price) }}</h4>
             <p class="mb-4">{{ item.description }}</p>
+
             <div class="mt-auto">
-            {% if not session.get('is_admin') %}
+              {% if not session.get('is_admin') %}
               {% if item.is_available %}
-              <form method="POST" action="{{ url_for('main.adding_to_basket', item_id=item.id) }}">
-                <button type="submit" class="btn w-100 py-3"
-                        style="background-color: #FF8C3F; color: white;">
-                  Add to Cart
-                </button>
-              </form>
+
+              {% set quantity = quantity if quantity is defined else request.args.get('quantity', 1) | int %}
+
+              <!-- 增減按鈕區塊 -->
+              <div class="mb-4 d-flex align-items-center">
+                <a href="{{ url_for('main.itemdetails', itemid=item.id, quantity=quantity, action='decrease') }}"
+                  class="btn btn-outline-secondary" aria-label="Decrease quantity">
+                  &minus;
+                </a>
+                <span class="mx-3 fs-5">{{ quantity }}</span>
+                <a href="{{ url_for('main.itemdetails', itemid=item.id, quantity=quantity, action='increase') }}"
+                  class="btn btn-outline-secondary" aria-label="Increase quantity">
+                  +
+                </a>
+              </div>
+
+              <!-- Add to Cart 按鈕 -->
+              <a href="{{ url_for('main.adding_to_basket_with_quantity', item_id=item.id, quantity=quantity) }}"
+                class="btn btn-success mb-4">
+                <i class="bi bi-bag-plus"></i>&nbsp;&nbsp;Add to Cart
+              </a>
+
               {% else %}
               <button type="button" class="btn btn-secondary w-100 py-3" disabled>
                 Sold Out
               </button>
               {% endif %}
-            {% endif %}
+              {% endif %}
             </div>
+
           </div>
         </div>
+
       </div>
     </div>
   </div>
 </div>
-
 {% endblock %}
