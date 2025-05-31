@@ -24,7 +24,11 @@ def get_items():
 
 def get_all_categories():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT DISTINCT category_name FROM categories")
+    cur.execute("""
+        SELECT DISTINCT category_name 
+        FROM categories
+        WHERE is_deleted = 0
+    """)
     rows = cur.fetchall()
     cur.close()
     return [row['category_name'] for row in rows]
@@ -243,7 +247,11 @@ def is_admin(username):
 
 def get_categories():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT category_id, category_name FROM categories")
+    cur.execute("""
+        SELECT category_id, category_name 
+        FROM categories
+        WHERE is_deleted = 0
+    """)
     categories = cur.fetchall()
     cur.close()
     return [(c['category_id'], c['category_name']) for c in categories]
@@ -267,12 +275,6 @@ def insert_category(category_name,):
     mysql.connection.commit()
     cur.close()
 
-def delete_category(category_id):
-    cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM categories where category_id =%s", (category_id,))
-    mysql.connection.commit()
-    cur.close()
-
 def is_category_taken(category_name):
     conn = mysql.connection
     with conn.cursor() as cursor:
@@ -289,7 +291,6 @@ def insert_item(name, description, price,image,category_id, is_available):
     cur.close()
 
 def update_item(item_id, new_name, new_description, new_price, new_category_id):
-    
     cur = mysql.connection.cursor()
     sql = """
         UPDATE items
@@ -306,6 +307,12 @@ def update_item(item_id, new_name, new_description, new_price, new_category_id):
 def mark_item_as_deleted(item_id):
     cur = mysql.connection.cursor()
     cur.execute("UPDATE items SET is_deleted = 1 WHERE item_id = %s", (item_id,))
+    mysql.connection.commit()
+    cur.close()
+
+def mark_category_as_deleted(category_id):
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE categories SET is_deleted = 1 WHERE category_id = %s", (category_id,))
     mysql.connection.commit()
     cur.close()
 

@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
 from thaimeup import mysql
-from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db, get_all_categories, search_items, get_items_by_category, get_category_name, delete_category
-from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available,status_orders_for_item, mark_item_as_deleted, insert_category,insert_item,get_categories
+from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db, get_all_categories, search_items, get_items_by_category, get_category_name
+from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available,status_orders_for_item, mark_item_as_deleted, insert_category,insert_item,get_categories,mark_category_as_deleted
 from thaimeup.session import get_basket, add_to_basket, empty_basket, get_user
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddCategoryForm,AddItemForm,EditItemForm, DeleteCategoryForm
 from thaimeup.models import UserAccount,UserInfo, BasketItem, Basket, Order, OrderStatus
@@ -250,12 +250,12 @@ def manage_categories():
         category_id = delete_form.category_id.data
         category_name = get_category_name(category_id)
 
-        items = get_items_by_category(category_name)
-        if items:
+        active_items = get_items_by_category(category_name)
+        if active_items:
             flash("This category is associated with menu products. Please edit those products in order to delete it.")
             return redirect(url_for('main.manage_categories'))
-
-        delete_category(category_id)
+        
+        mark_category_as_deleted(category_id)
         flash("Category deleted successfully.")
         return redirect(url_for('main.manage_categories'))
     
@@ -323,10 +323,7 @@ def edit_menu(item_id):
 def delete_menu(item_id):
     statuses = status_orders_for_item(item_id)
 
-    if not statuses:
-        mark_item_as_deleted(item_id)
-        flash("Item deleted successfully.")
-    elif any(status not in ['COMPLETED', 'CANCELLED'] for status in statuses):
+    if statuses and any(status not in ['COMPLETED', 'CANCELLED'] for status in statuses):
         flash("This item is part of pending order(s). Please complete or cancel the order(s) to remove it.")
     else:
         mark_item_as_deleted(item_id)
