@@ -249,12 +249,12 @@ def manage_categories():
         category_id = delete_form.category_id.data
         category_name = get_category_name(category_id)
 
-        items = get_items_by_category(category_name)
-        if items:
+        active_items = get_items_by_category(category_name)
+        if active_items:
             flash("This category is associated with menu products. Please edit those products in order to delete it.")
             return redirect(url_for('main.manage_categories'))
-
-        delete_category(category_id)
+        
+        mark_category_as_deleted(category_id)
         flash("Category deleted successfully.")
         return redirect(url_for('main.manage_categories'))
     
@@ -322,10 +322,7 @@ def edit_menu(item_id):
 def delete_menu(item_id):
     statuses = status_orders_for_item(item_id)
 
-    if not statuses:
-        mark_item_as_deleted(item_id)
-        flash("Item deleted successfully.")
-    elif any(status not in ['COMPLETED', 'CANCELLED'] for status in statuses):
+    if statuses and any(status not in ['COMPLETED', 'CANCELLED'] for status in statuses):
         flash("This item is part of pending order(s). Please complete or cancel the order(s) to remove it.")
     else:
         mark_item_as_deleted(item_id)
