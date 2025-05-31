@@ -1,21 +1,17 @@
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap5
 from flask_mysqldb import MySQL
-from dotenv import load_dotenv
-import os
+from . import views
 
 mysql = MySQL()
 
 def create_app():
-    load_dotenv()
-
     app = Flask(__name__)
     app.debug = False
 
     app.secret_key = 'BetterSecretNeeded123'
-    # MySQL configurations
     app.config['MYSQL_USER'] = 'root'
-    app.config['MYSQL_PASSWORD'] = '1234567'
+    app.config['MYSQL_PASSWORD'] = '12345678'
     app.config['MYSQL_DB'] = 'thaimeup'
     app.config['MYSQL_HOST'] = 'localhost'
     app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
@@ -24,7 +20,6 @@ def create_app():
     
     Bootstrap5(app)
 
-    from . import views
     app.register_blueprint(views.bp)
 
     @app.errorhandler(404)
@@ -35,6 +30,5 @@ def create_app():
     def internal_error(e):
         return render_template("500.html")
 
-    from . import session
     return app
 

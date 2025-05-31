@@ -1,7 +1,5 @@
 from thaimeup.db import get_item
 from thaimeup.models import Basket, BasketItem
-from thaimeup.models import UserInfo, Order, OrderStatus
-
 from flask import session
 
 def get_user():

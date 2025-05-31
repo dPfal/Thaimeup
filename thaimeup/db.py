@@ -3,7 +3,9 @@ from thaimeup.models import Order, OrderStatus, UserInfo, Item, BasketItem
 from thaimeup.models import UserAccount
 from datetime import datetime
 from flask import Flask
-from . import mysql
+from flask_mysqldb import MySQL
+
+mysql = MySQL()
 
 
 def get_items():
