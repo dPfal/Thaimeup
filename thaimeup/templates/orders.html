@@ -38,7 +38,7 @@
                 <div class="col-md-6">
                     <h5 class="fs-5 mb-2">Order Info</h5>
                     <ul class="list-unstyled mb-0">
-                        <li><strong>Date:</strong> {{ order.date.strftime('%Y-%m-%d') }}</li>
+                        <li><strong>Date:</strong> {{ order.date.strftime('%Y-%m-%d %H:%M:%S') }}</li>
                         <li><strong>Total:</strong> ${{ "%.2f"|format(order.calculate_total_cost()) }}</li>
                         <li><strong>Delivery:</strong> {{ order.delivery_method }}</li>
                         <li><strong>Payment:</strong> {{ order.payment_method }}</li>
