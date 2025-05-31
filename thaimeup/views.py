@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, session, flash
 from flask import redirect, url_for,abort
-from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db, get_all_categories, search_items, get_items_by_category, get_category_name, delete_category
-from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available,status_orders_for_item, mark_item_as_deleted, insert_category,insert_item,get_categories
+from thaimeup.db import  get_orders, check_for_user, add_user, is_admin, insert_order,update_order_status_in_db, get_all_categories, search_items, get_items_by_category, get_category_name,get_category_id
+from thaimeup.db import get_items, get_item, update_item,mark_item_as_unavailable, mark_item_as_available,status_orders_for_item, mark_item_as_deleted, insert_category,insert_item,get_categories,mark_category_as_deleted
 from thaimeup.session import get_basket, add_to_basket, empty_basket, get_user
 from thaimeup.forms import CheckoutForm, LoginForm, RegisterForm,AddCategoryForm,AddItemForm,EditItemForm, DeleteCategoryForm
 from thaimeup.models import Order, OrderStatus
@@ -313,7 +313,9 @@ def edit_menu(item_id):
         form.name.data = item.name
         form.description.data = item.description
         form.price.data = item.price
-        form.category.data = item.category
+        category_id = get_category_id(item.category)
+        form.category.data = category_id
+        print("Current item category name:", item.category)
 
     return render_template("edit_item_admin.html", form=form, item=item)
 

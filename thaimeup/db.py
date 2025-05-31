@@ -268,6 +268,16 @@ def get_category_name(category_id):
     cur.close()
     return row['category_name'] if row else None
 
+def get_category_id(category_name):
+    cur = mysql.connection.cursor()
+    cur.execute(
+        "SELECT category_id FROM categories WHERE category_name = %s",
+        (category_name,)
+    )
+    row = cur.fetchone()
+    cur.close()
+    return row['category_id'] if row else None
+
 def insert_category(category_name,):
     cur = mysql.connection.cursor()
     cur.execute("""
