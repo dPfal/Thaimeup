@@ -50,10 +50,11 @@ CREATE TABLE users (
 
 INSERT INTO users VALUES
 (2,'regular1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','regular1@gmail.com','regular','regular',0,'123456789'),
-(3,'regular2','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','regular2@gmail.com','regular2','regular2',0,'1235123623'),
+(3,'regular2','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','regular2@gmail.com','regular2','regular2',0,'1235123622'),
 (4,'regular3','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','regular3@gmail.com','regular3','regular3',0,'1235124623'),
-(5,'admin1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','admin@gmail.com','admin','admin',1,'1235123656'),
-(6,'admin2','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','admin2@gmail.com','admin2','admin2',1,'1231246234');
+(5,'regular4','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','regular4@gmail.com','regular4','regular4',0,'1235124624'),
+(6,'admin1','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','admin@gmail.com','admin','admin',1,'1235123656'),
+(7,'admin2','8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92','admin2@gmail.com','admin2','admin2',1,'1231246234');
 
 CREATE TABLE items (
   item_id INT NOT NULL AUTO_INCREMENT,
@@ -82,7 +83,9 @@ INSERT INTO items (name, description, price, image, category_id, is_available, i
 ('Larb','Spicy minced chicken salad with lime juice, chili, mint, and roasted rice powder',18.00,'larb.jpeg',3,1,0),
 ('Mango Sticky Rice','Sweet sticky rice served with fresh mango and coconut cream',14.00,'mangosticky.jpeg',2,1,0),
 ('Pad Kee Mao','Spicy stir-fried rice noodles with chili, garlic, basil, and vegetables',21.00,'padkeemao.jpeg',1,1,0),
-('Thai Satay','Grilled marinated chicken skewers served with peanut sauce and cucumber relish',16.50,'satay.jpeg',2,1,0);
+('Thai Satay','Grilled marinated chicken skewers served with peanut sauce and cucumber relish',16.50,'satay.jpeg',2,1,0),
+('Khao khluk kapi', 'Fried rice made with shrimp paste and topped with crispy dried shrimps, dried mango gratings, omelet shavings, chilies, cucumbers, red and green onions'
+,21,'khaokhlukkapi.jpeg',5,1,0);
 
 CREATE TABLE orders (
   order_id INT NOT NULL AUTO_INCREMENT,

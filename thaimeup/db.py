@@ -326,12 +326,6 @@ def mark_category_as_deleted(category_id):
     mysql.connection.commit()
     cur.close()
 
-def delete_item(item_id):
-    cur = mysql.connection.cursor()
-    cur.execute("DELETE FROM items WHERE item_id = %s", (item_id,))
-    mysql.connection.commit()
-    cur.close()
-
 def mark_item_as_available(item_id):
     cur = mysql.connection.cursor()
     cur.execute("UPDATE items SET is_available = 1 WHERE item_id = %s", (item_id,))
