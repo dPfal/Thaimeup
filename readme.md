@@ -34,3 +34,16 @@ We implemented soft delete functionality by adding a column named is_deleted to 
 The main purpose of this is to ensure that items still appear on the orders page even if they are deleted after an order has been completed or canceled.
 However, on the landing page, users will not be able to see any items that are marked as deleted.
 
+## How to Run (Quick Start)
+
+```bash
+git clone https://github.com/dPfal/Thaimeup.git
+cd Thaimeup
+python3 -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+mysql -u <user> -p -e "CREATE DATABASE thaimeup;"
+mysql -u <user> -p thaimeup < thaimeup.sql
+# Edit thaimeup/__init__.py → update DB user/password
+python run.py
+Open http://127.0.0.1:5000/ in your browser to see the app.
+
