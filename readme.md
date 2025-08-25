@@ -45,5 +45,7 @@ mysql -u <user> -p -e "CREATE DATABASE thaimeup;"
 mysql -u <user> -p thaimeup < thaimeup.sql
 # Edit thaimeup/__init__.py → update DB user/password
 python run.py
+
 Open http://127.0.0.1:5000/ in your browser to see the app.
+
 
